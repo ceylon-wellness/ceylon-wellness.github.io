@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en" translate="yes">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#17382f" />
+    <meta name="robots" content="index,follow" />
+    <meta name="google" content="translate" />
+    <link rel="manifest" href="./site.webmanifest" />
+    <title>Ceylon Wellness — Your Journey to Wellness Begins in Sri Lanka</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      (function () {
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect !== location.href) history.replaceState(null, "", redirect);
+      })();
+    </script>
+    <script type="module" src="./src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,1 @@
+export function restoreGithubPagesPath(){const u=sessionStorage.getItem('redirect');if(u){sessionStorage.removeItem('redirect');const x=new URL(u);history.replaceState(null,'',x.pathname+x.search+x.hash)}}

@@ -1,0 +1,27 @@
+CEYLON WELLNESS BUSINESS PLATFORM RELEASE
+
+Included:
+- Existing full website foundation
+- EN / PL / RU / DE / FR language selector + browser translation fallback
+- Legal / trust / payment foundation
+- Admin authentication + roles
+- Admin dashboard
+- Leads CRM list
+- Quotation builder
+- Secure quotation token issuance
+- Customer quotation page
+- Quotation acceptance -> booking creation
+- Customer booking detail updates
+- Bank-transfer payment initiation
+- Admin booking/payment verification surface
+- Localised CMS page editor
+- RLS migration and admin helper functions
+- Hardened sensitive Edge Functions
+
+Not yet live/configured:
+- Real business legal entity details
+- Production domain
+- Email provider/domain secrets
+- Card payment merchant account/webhooks
+- Final legal review
+- Full end-to-end production QA against the user's Supabase project

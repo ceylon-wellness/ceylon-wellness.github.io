@@ -172,27 +172,82 @@ return (
         <div className="adminBarActions" style={{marginBottom:'1rem'}}>{!showTrash&&<><button className="outlineBtn" onClick={()=>setEditing(!editing)}><Pencil/> {editing?'Cancel edit':'Edit'}</button><a className="outlineBtn" href={wa(travelMsg)} target="_blank"><MessageCircle/> WhatsApp</a><a className="outlineBtn" href={emailLink(selected.email,`Ceylon Wellness · ${selected.journey_ref||'Journey'}`,travelMsg)}><Mail/> Email</a><button className="outlineBtn" onClick={()=>moveToTrash('travel',selected.id)}><Trash2/> Delete</button></>}{showTrash&&<><button className="outlineBtn" onClick={()=>restore('travel',selected.id)}><RotateCcw/> Restore</button>{role==='SUPER_ADMIN'&&<button className="outlineBtn" onClick={()=>permanentDelete('travel',selected.id)}><Trash2/> Permanent delete</button>}</>}</div>
         {editing ? (
           <div className="adminEditGrid">
-            <label>Name<input value={draft.name||''} onChange={e=>setDraft({...draft,name:e.target.value})}/></label>
-            <label>Email<input value={draft.email||''} onChange={e=>setDraft({...draft,email:e.target.value})}/></label>
-            <label>WhatsApp<input value={draft.whatsapp||''} onChange={e=>setDraft({...draft,whatsapp:e.target.value})}/></label>
-            <label>Preferred language<input list="admin-travel-language-options" value={draft.preferred_language||''} onChange={e=>setDraft({...draft,preferred_language:e.target.value})} placeholder="Select or type a language"/><datalist id="admin-travel-language-options">{ADMIN_LANGUAGE_SUGGESTIONS.map(x=><option key={x} value={x}/>)}</datalist></label>
-            <label>Travel dates<input value={draft.travel_dates||''} onChange={e=>setDraft({...draft,travel_dates:e.target.value})}/></label>
-            <label>Travellers<input type="number" min="1" value={draft.travellers||1} onChange={e=>setDraft({...draft,travellers:Number(e.target.value)})}/></label>
-            <label>Airport<input value={draft.arrival_airport||''} onChange={e=>setDraft({...draft,arrival_airport:e.target.value})}/></label>
-            <label>Flight<input value={draft.flight_number||''} onChange={e=>setDraft({...draft,flight_number:e.target.value})}/></label>
-            <label>Landing time<input value={draft.landing_time||''} onChange={e=>setDraft({...draft,landing_time:e.target.value})}/></label>
-            <label>Airport pickup<input value={draft.airport_pickup||''} onChange={e=>setDraft({...draft,airport_pickup:e.target.value})}/></label>
-            <label>Wellness / journey style<input value={draft.journey_style||''} onChange={e=>setDraft({...draft,journey_style:e.target.value})}/></label>
-            <label>Accommodation<input value={draft.accommodation||''} onChange={e=>setDraft({...draft,accommodation:e.target.value})}/></label>
-            <label>Transport<input value={draft.transport||''} onChange={e=>setDraft({...draft,transport:e.target.value})}/></label>
-            <label>Budget<input value={draft.budget_range||''} onChange={e=>setDraft({...draft,budget_range:e.target.value})}/></label>
-            <label style={{gridColumn:'1 / -1'}}>Trip requirements<textarea value={draft.requirements||''} onChange={e=>setDraft({...draft,requirements:e.target.value})}/></label>
-            <label style={{gridColumn:'1 / -1'}}>INTERNAL ADMIN NOTES<textarea value={draft.admin_notes||''} onChange={e=>setDraft({...draft,admin_notes:e.target.value})}/></label>
-            <div className="itineraryEditor" style={{gridColumn:'1 / -1'}}>
-              <div className="sectionTitleRow"><h3>Itinerary editing</h3><button className="outlineBtn" onClick={addDay}><Plus/> Add day</button></div>
-              {(draft.itinerary||[]).map((day,idx)=><div key={`${day.day}-${idx}`} className="itineraryDay"><div className="fieldRow"><label>Day<input type="number" value={day.day} onChange={e=>changeDay(idx,'day',Number(e.target.value))}/></label><button className="outlineBtn" onClick={()=>removeDay(idx)}><Trash2/> Remove</button></div><label>Place<input value={day.place||''} onChange={e=>changeDay(idx,'place',e.target.value)}/></label><label>Focus<input value={day.focus||''} onChange={e=>changeDay(idx,'focus',e.target.value)}/></label><label>Activity<textarea value={day.activity||''} onChange={e=>changeDay(idx,'activity',e.target.value)}/></label><label>Stay<input value={day.stay||''} onChange={e=>changeDay(idx,'stay',e.target.value)}/></label><label>Notes<textarea value={day.notes||''} onChange={e=>changeDay(idx,'notes',e.target.value)}/></label></div>)}
+            <div className="editorSection">
+              <div className="editorSectionHeader">
+                <h3>Traveller Details</h3>
+              </div>
+              <div className="editorFieldGrid editorFieldGrid--two">
+                <label className="editorField"><span>Name</span><input value={draft.name||''} onChange={e=>setDraft({...draft,name:e.target.value})}/></label>
+                <label className="editorField"><span>Email</span><input value={draft.email||''} onChange={e=>setDraft({...draft,email:e.target.value})}/></label>
+                <label className="editorField"><span>WhatsApp</span><input value={draft.whatsapp||''} onChange={e=>setDraft({...draft,whatsapp:e.target.value})}/></label>
+                <label className="editorField"><span>Preferred language</span><input list="admin-travel-language-options" value={draft.preferred_language||''} onChange={e=>setDraft({...draft,preferred_language:e.target.value})} placeholder="Select or type a language"/><datalist id="admin-travel-language-options">{ADMIN_LANGUAGE_SUGGESTIONS.map(x=><option key={x} value={x}/>)}</datalist></label>
+                <label className="editorField"><span>Travellers</span><input type="number" min="1" value={draft.travellers||1} onChange={e=>setDraft({...draft,travellers:Number(e.target.value)})}/></label>
+                <label className="editorField"><span>Travel dates</span><input value={draft.travel_dates||''} onChange={e=>setDraft({...draft,travel_dates:e.target.value})}/></label>
+              </div>
             </div>
-            <button className="button" onClick={saveLead}><CheckCircle2/> Save all changes</button>
+
+            <div className="editorSection">
+              <div className="editorSectionHeader">
+                <h3>Travel & Arrival</h3>
+              </div>
+              <div className="editorFieldGrid editorFieldGrid--two">
+                <label className="editorField"><span>Arrival airport</span><input value={draft.arrival_airport||''} onChange={e=>setDraft({...draft,arrival_airport:e.target.value})}/></label>
+                <label className="editorField"><span>Flight number</span><input value={draft.flight_number||''} onChange={e=>setDraft({...draft,flight_number:e.target.value})}/></label>
+                <label className="editorField"><span>Landing time</span><input value={draft.landing_time||''} onChange={e=>setDraft({...draft,landing_time:e.target.value})}/></label>
+                <label className="editorField"><span>Airport pickup</span><input value={draft.airport_pickup||''} onChange={e=>setDraft({...draft,airport_pickup:e.target.value})}/></label>
+              </div>
+            </div>
+
+            <div className="editorSection">
+              <div className="editorSectionHeader">
+                <h3>Journey Preferences</h3>
+              </div>
+              <div className="editorFieldGrid editorFieldGrid--two">
+                <label className="editorField"><span>Wellness / journey style</span><input value={draft.journey_style||''} onChange={e=>setDraft({...draft,journey_style:e.target.value})}/></label>
+                <label className="editorField"><span>Accommodation</span><input value={draft.accommodation||''} onChange={e=>setDraft({...draft,accommodation:e.target.value})}/></label>
+                <label className="editorField"><span>Transport</span><input value={draft.transport||''} onChange={e=>setDraft({...draft,transport:e.target.value})}/></label>
+                <label className="editorField"><span>Budget</span><input value={draft.budget_range||''} onChange={e=>setDraft({...draft,budget_range:e.target.value})}/></label>
+              </div>
+              <label className="editorField editorField--full"><span>Trip requirements</span><textarea value={draft.requirements||''} onChange={e=>setDraft({...draft,requirements:e.target.value})}/></label>
+            </div>
+
+            <div className="editorSection">
+              <div className="editorSectionHeader">
+                <h3>Internal Admin Notes</h3>
+                <span className="editorPrivateNote">Private — not visible to the traveller</span>
+              </div>
+              <label className="editorField editorField--full">
+                <span>Internal Admin Notes</span>
+                <textarea value={draft.admin_notes||''} onChange={e=>setDraft({...draft,admin_notes:e.target.value})}/>
+              </label>
+            </div>
+
+            <div className="editorSection">
+              <div className="editorSectionHeader">
+                <h3>Day-by-day itinerary</h3>
+              </div>
+              <div className="itineraryEditor">
+                {(draft.itinerary||[]).map((day,idx)=><div key={`${day.day}-${idx}`} className="itineraryDayCard">
+                  <div className="itineraryCardHeader">
+                    <span className="itineraryDayLabel">DAY {day.day || idx + 1}</span>
+                    <button type="button" className="editorRemoveBtn" onClick={()=>removeDay(idx)}><Trash2/> Remove</button>
+                  </div>
+                  <div className="itineraryFieldGrid">
+                    <label className="editorField editorField--full"><span>Location</span><input value={day.place||''} onChange={e=>changeDay(idx,'place',e.target.value)}/></label>
+                    <label className="editorField editorField--full"><span>Wellness Focus</span><input value={day.focus||''} onChange={e=>changeDay(idx,'focus',e.target.value)}/></label>
+                    <label className="editorField editorField--full"><span>Activity / Plan</span><textarea value={day.activity||''} onChange={e=>changeDay(idx,'activity',e.target.value)}/></label>
+                    <label className="editorField editorField--full"><span>Stay / Hotel</span><input value={day.stay||''} onChange={e=>changeDay(idx,'stay',e.target.value)}/></label>
+                    <label className="editorField editorField--full"><span>Notes</span><textarea value={day.notes||''} onChange={e=>changeDay(idx,'notes',e.target.value)}/></label>
+                  </div>
+                </div>)}
+                <button type="button" className="addDayBtn" onClick={addDay}><Plus/> Add day</button>
+              </div>
+            </div>
+
+            <div className="editorActionBar">
+              <button type="button" className="outlineBtn" onClick={()=>setEditing(false)}><Pencil/> Cancel edit</button>
+              <button type="button" className="button" onClick={saveLead}><CheckCircle2/> Save all changes</button>
+            </div>
           </div>
         ) : (
           <div className="detailGrid">
@@ -214,16 +269,40 @@ return (
         <div className="adminBarActions" style={{marginBottom:'1rem'}}>{!showTrash&&<><button className="outlineBtn" onClick={()=>setEditing(!editing)}><Pencil/> {editing?'Cancel edit':'Edit'}</button><a className="outlineBtn" href={wa(reikiMsg)} target="_blank"><MessageCircle/> WhatsApp</a><a className="outlineBtn" href={emailLink(selectedReiki.email,`Ceylon Wellness · Online Reiki · ${selectedReiki.request_ref||''}`,reikiMsg)}><Mail/> Email</a><button className="outlineBtn" onClick={()=>moveToTrash('reiki',selectedReiki.id)}><Trash2/> Delete</button></>}{showTrash&&<><button className="outlineBtn" onClick={()=>restore('reiki',selectedReiki.id)}><RotateCcw/> Restore</button>{role==='SUPER_ADMIN'&&<button className="outlineBtn" onClick={()=>permanentDelete('reiki',selectedReiki.id)}><Trash2/> Permanent delete</button>}</>}</div>
         {editing ? (
           <div className="adminEditGrid">
-            <label>Name<input value={reikiDraft.name||''} onChange={e=>setReikiDraft({...reikiDraft,name:e.target.value})}/></label>
-            <label>Email<input value={reikiDraft.email||''} onChange={e=>setReikiDraft({...reikiDraft,email:e.target.value})}/></label>
-            <label>WhatsApp<input value={reikiDraft.whatsapp||''} onChange={e=>setReikiDraft({...reikiDraft,whatsapp:e.target.value})}/></label>
-            <label>Language<input list="admin-reiki-language-options" value={reikiDraft.preferred_language||''} onChange={e=>setReikiDraft({...reikiDraft,preferred_language:e.target.value})} placeholder="Select or type a language"/><datalist id="admin-reiki-language-options">{ADMIN_LANGUAGE_SUGGESTIONS.map(x=><option key={x} value={x}/>)}</datalist></label>
-            <label>Reiki level<input value={reikiDraft.reiki_level||''} onChange={e=>setReikiDraft({...reikiDraft,reiki_level:e.target.value})}/></label>
-            <label>Timezone<input value={reikiDraft.timezone||''} onChange={e=>setReikiDraft({...reikiDraft,timezone:e.target.value})}/></label>
-            <label>Preferred schedule<input value={reikiDraft.preferred_schedule||''} onChange={e=>setReikiDraft({...reikiDraft,preferred_schedule:e.target.value})}/></label>
-            <label style={{gridColumn:'1 / -1'}}>Client notes<textarea value={reikiDraft.notes||''} onChange={e=>setReikiDraft({...reikiDraft,notes:e.target.value})}/></label>
-            <label style={{gridColumn:'1 / -1'}}>INTERNAL ADMIN NOTES<textarea value={reikiDraft.admin_notes||''} onChange={e=>setReikiDraft({...reikiDraft,admin_notes:e.target.value})}/></label>
-            <button className="button" onClick={saveReiki}><CheckCircle2/> Save all changes</button>
+            <div className="editorSection">
+              <div className="editorSectionHeader">
+                <h3>Client Details</h3>
+              </div>
+              <div className="editorFieldGrid editorFieldGrid--two">
+                <label className="editorField"><span>Name</span><input value={reikiDraft.name||''} onChange={e=>setReikiDraft({...reikiDraft,name:e.target.value})}/></label>
+                <label className="editorField"><span>Email</span><input value={reikiDraft.email||''} onChange={e=>setReikiDraft({...reikiDraft,email:e.target.value})}/></label>
+                <label className="editorField"><span>WhatsApp</span><input value={reikiDraft.whatsapp||''} onChange={e=>setReikiDraft({...reikiDraft,whatsapp:e.target.value})}/></label>
+                <label className="editorField"><span>Language</span><input list="admin-reiki-language-options" value={reikiDraft.preferred_language||''} onChange={e=>setReikiDraft({...reikiDraft,preferred_language:e.target.value})} placeholder="Select or type a language"/><datalist id="admin-reiki-language-options">{ADMIN_LANGUAGE_SUGGESTIONS.map(x=><option key={x} value={x}/>)}</datalist></label>
+                <label className="editorField"><span>Reiki level</span><input value={reikiDraft.reiki_level||''} onChange={e=>setReikiDraft({...reikiDraft,reiki_level:e.target.value})}/></label>
+                <label className="editorField"><span>Timezone</span><input value={reikiDraft.timezone||''} onChange={e=>setReikiDraft({...reikiDraft,timezone:e.target.value})}/></label>
+                <label className="editorField editorField--full"><span>Preferred schedule</span><input value={reikiDraft.preferred_schedule||''} onChange={e=>setReikiDraft({...reikiDraft,preferred_schedule:e.target.value})}/></label>
+              </div>
+            </div>
+
+            <div className="editorSection">
+              <div className="editorSectionHeader">
+                <h3>Client Notes</h3>
+              </div>
+              <label className="editorField editorField--full"><span>Client notes</span><textarea value={reikiDraft.notes||''} onChange={e=>setReikiDraft({...reikiDraft,notes:e.target.value})}/></label>
+            </div>
+
+            <div className="editorSection">
+              <div className="editorSectionHeader">
+                <h3>Internal Admin Notes</h3>
+                <span className="editorPrivateNote">Private — not visible to the traveller</span>
+              </div>
+              <label className="editorField editorField--full"><span>Internal Admin Notes</span><textarea value={reikiDraft.admin_notes||''} onChange={e=>setReikiDraft({...reikiDraft,admin_notes:e.target.value})}/></label>
+            </div>
+
+            <div className="editorActionBar">
+              <button type="button" className="outlineBtn" onClick={()=>setEditing(false)}><Pencil/> Cancel edit</button>
+              <button type="button" className="button" onClick={saveReiki}><CheckCircle2/> Save all changes</button>
+            </div>
           </div>
         ) : (
           <div className="detailGrid">

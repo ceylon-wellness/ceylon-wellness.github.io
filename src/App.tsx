@@ -1,4 +1,4 @@
-﻿import {Routes,Route,Link} from 'react-router-dom';
+import {Routes,Route,Link} from 'react-router-dom';
 import {Leaf,Menu,X,ArrowRight,ShieldCheck,MessageCircle,Languages,Sparkles,MapPin,Compass,Heart,CheckCircle2,ExternalLink,RotateCcw,Clock,Users,Footprints,Send,Plane,Hotel,FileText,Pencil,Plus,Trash2,Download,Eye,Settings2,Mail,Phone,LockKeyhole,LogIn,LogOut,RefreshCw,Search,UserRound} from 'lucide-react';
 import {useEffect,useState} from 'react';
 import { jsPDF } from 'jspdf';
@@ -736,11 +736,30 @@ const optionText:Record<Lang,Record<string,string>>={
 function Shell({children,lang,setLang}:{children:React.ReactNode,lang:Lang,setLang:(l:Lang)=>void}){const [open,setOpen]=useState(false);const c=copy[lang];return <><header><Link className="brand" to="/"><span className="mark"><Leaf/></span><span>CEYLON WELLNESS<small>{publicText(lang,'brandTagline')}</small></span></Link><button className="menu" onClick={()=>setOpen(!open)}>{open?<X/>:<Menu/>}</button><nav className={open?'open':''}>{[['/wellness',c.nav[0]],['/sri-lanka',c.nav[1]],['/dr-vipula',c.nav[2]],['/reiki',c.nav[3]],['/about',c.nav[4]]].map(([p,n])=><Link to={p} key={p}>{n}</Link>)}<label className="lang"><Languages/><select value={lang} onChange={e=>setLang(e.target.value as Lang)}>{LANGS.map(l=><option key={l}>{l}</option>)}</select></label><Link className="pill" to="/ask-ceylon"><Sparkles/> {c.ask}</Link></nav></header>{children}<footer><div><b>CEYLON WELLNESS</b><p>{publicText(lang,'footerIntro')}</p></div><div><b>{publicText(lang,'explore')}</b><Link to="/ask-ceylon">{c.ask}</Link><Link to="/reiki">{publicText(lang,'reikiRole')}</Link><Link to="/dr-vipula">Dr. Vipula</Link></div><div><b>{publicText(lang,'contact')}</b><a href={wa(c.public?.humanMessage||'Hello Ceylon Wellness.')} target="_blank">{publicText(lang,'whatsapp')} {PRIMARY.phone}</a><Link to="/privacy">{publicText(lang,'privacy')}</Link></div><small>© {new Date().getFullYear()} Ceylon Wellness · {publicText(lang,'wellnessNotice')}</small></footer><a className="waFloat" href={wa(c.public?.humanMessage||'Hello Ceylon Wellness.')} target="_blank"><MessageCircle/><span>{publicText(lang,'whatsapp')}</span></a></>}
 const CTA=({lang}:{lang:Lang})=> <section className="cta"><div><span className="eyebrow">{publicText(lang,'ctaEyebrow')}</span><h2>{publicText(lang,'ctaHeading')}</h2><p>{publicText(lang,'ctaDescription')}</p></div><a className="button light" href={wa(copy[lang].public?.humanMessage||'Hello Ceylon Wellness.')} target="_blank">{publicText(lang,'ctaButton')} <ArrowRight/></a></section>;
 
+const HERO_IMAGES=[
+  '/images/hero/hero-01-wellness.png',
+  '/images/hero/hero-02-ayurveda.png',
+  '/images/hero/hero-03-reiki.png',
+  '/images/hero/hero-04-wildlife.png',
+  '/images/hero/hero-05-ocean.png'
+] as const;
+
 function Home({lang}:{lang:Lang}){
   const c=copy[lang];
+  const [heroIndex,setHeroIndex]=useState(0);
+  useEffect(()=>{
+    if(typeof window==='undefined'||window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const timer=window.setInterval(()=>setHeroIndex(i=>(i+1)%HERO_IMAGES.length),6500);
+    return ()=>window.clearInterval(timer);
+  },[]);
   const journeyCards=[['teaCountry','teaDescription'],['oceanCoast','oceanDescription'],['natureWildlife','natureDescription'],['cultureSpirit','cultureDescription']] as const;
   return <main>
-    <section className="hero heroPhoto"><div className="heroText"><span className="eyebrow">CEYLON WELLNESS · SRI LANKA</span><h1>{c.hero}</h1><p>{c.sub}</p><div className="actions"><Link className="button" to="/ask-ceylon">{c.design} <ArrowRight/></Link><Link className="textLink" to="/ask-ceylon"><Sparkles/> {c.ask}</Link></div><div className="heroTrust"><span><ShieldCheck/> {c.free}</span><span><Languages/> EN · PL · RU · DE · FR</span></div></div><div className="photoCredit">{publicText(lang,'photoCredit')}</div></section>
+    <section className="hero heroPhoto heroCinematic">
+      <div className="heroSlides" aria-hidden="true">{HERO_IMAGES.map((src,i)=><div key={src} className={`heroSlide ${i===heroIndex?'active':''}`} style={{backgroundImage:`url(${src})`}}/>)}</div>
+      <div className="heroShade" aria-hidden="true"/>
+      <div className="heroText"><span className="eyebrow">CEYLON WELLNESS · SRI LANKA</span><h1>{c.hero}</h1><p>{c.sub}</p><div className="actions"><Link className="button" to="/ask-ceylon">{c.design} <ArrowRight/></Link><Link className="textLink" to="/ask-ceylon"><Sparkles/> {c.ask}</Link></div><div className="heroTrust"><span><ShieldCheck/> {c.free}</span><span><Languages/> EN · PL · RU · DE · FR</span></div></div>
+      <div className="heroDots" aria-label="Hero images">{HERO_IMAGES.map((_,i)=><button key={i} type="button" className={i===heroIndex?'active':''} aria-label={`Show image ${i+1}`} aria-pressed={i===heroIndex} onClick={()=>setHeroIndex(i)}/>)}</div>
+    </section>
     <section className="intro"><span className="eyebrow">{publicText(lang,'introEyebrow')}</span><h2>{c.feel}</h2><div className="feelings">{['Calm','Renew','Reconnect','Reset','Move'].map(x=><Link to="/ask-ceylon" key={x}>{optionText[lang][x]}<ArrowRight/></Link>)}</div></section>
     <section className="aiFeature"><div className="aiOrb"><Compass/></div><div><span className="eyebrow">{publicText(lang,'guideEyebrow')}</span><h2>{c.smart}</h2><p>{c.smartSub}</p><div className="aiChips"><span>{publicText(lang,'chipNoApi')}</span><span>{publicText(lang,'chipNoAccount')}</span><span>{publicText(lang,'chipLanguages')}</span><span>{publicText(lang,'chipWhatsApp')}</span></div><Link className="button" to="/ask-ceylon">{c.start} <ArrowRight/></Link></div></section>
     <section className="journeyPreview"><span className="eyebrow">{publicText(lang,'journeyEyebrow')}</span><h2>{publicText(lang,'journeyHeading')}</h2><div className="journeyTiles">{journeyCards.map(([title,description],i)=><article className={`journey j${i}`} key={title}><Compass/><h3>{publicText(lang,title)}</h3><p>{publicText(lang,description)}</p></article>)}</div></section>

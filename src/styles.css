@@ -855,3 +855,46 @@
 .v102DangerZone{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px;padding:14px 16px;border:1px dashed rgba(160,57,57,.28);border-radius:14px;color:#6d5b5b}
 @media(max-width:900px){.simpleCostTable .costTableHead{display:none}.simpleCostRow{grid-template-columns:1fr 1fr}.simpleCostRow>*{min-width:0}.simpleMath,.simpleFxGrid{grid-template-columns:1fr}.v102PersistentActions--top{position:static}.simpleTotal small{margin-left:0}}
 @media(max-width:620px){.simplePriceStep{grid-template-columns:1fr}.simpleStepNo{width:36px;height:36px}.simpleCostRow{grid-template-columns:1fr}.finalPriceEditor{align-items:stretch}.finalPriceEditor input{max-width:none;width:100%}.v102DangerZone{align-items:flex-start;flex-direction:column}}
+
+
+/* V2.1 Smart Request Auto-fill */
+.editorSection--received{background:linear-gradient(180deg,#f7fbf7 0%,#fffdf8 100%);border-color:rgba(30,77,58,.22)}
+.editorSection--received .editorSectionHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
+.receivedBadge{display:inline-flex;align-items:center;gap:.4rem;white-space:nowrap;padding:.55rem .75rem;border-radius:999px;background:#e8f3ea;color:#214f3b;font-weight:800;font-size:.78rem}
+.receivedBadge svg{width:16px;height:16px}
+.receivedFacts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;margin:.9rem 0}
+.receivedFacts span{padding:.65rem .75rem;border-radius:12px;font-size:.82rem;font-weight:750;border:1px solid rgba(30,77,58,.12);background:#fff}
+.receivedFacts .done{color:#214f3b;background:#f2f8f3}
+.receivedFacts .missing{color:#7c6544;background:#fff9ed;border-style:dashed}
+.receivedHint{margin:.35rem 0 .9rem;color:#52635a;font-size:.86rem;line-height:1.55}
+.agentImportDetails{border-top:1px solid rgba(30,77,58,.12);padding-top:.75rem}
+.agentImportDetails summary{cursor:pointer;display:flex;align-items:center;gap:.5rem;font-weight:800;color:#214f3b;list-style:none}
+.agentImportDetails summary::-webkit-details-marker{display:none}
+.agentImportDetails summary svg{width:17px;height:17px}
+.agentImportDetails summary span{margin-left:auto;font-size:.72rem;font-weight:700;color:#7b857f;text-transform:uppercase;letter-spacing:.08em}
+.agentImportBody{padding-top:.8rem}
+.agentImportBody>p{margin:0 0 .7rem;color:#68756f;font-size:.82rem;line-height:1.5}
+@media(max-width:760px){
+  .editorSection--received .editorSectionHeader{display:block}
+  .receivedBadge{margin-top:.65rem}
+  .receivedFacts{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+
+/* FINAL 4-STEP ADMIN: Traveller → Journey → Price → Ready to Send */
+.v10ProgressNav{grid-template-columns:auto 1fr auto 1fr auto 1fr auto auto}
+.v10ProgressNav>button:not(.v10MoreBtn){min-width:0}
+.v10ProgressNav .v10MoreBtn{margin-left:.35rem}
+
+/* Bookings are operational journey details, not a separate main step. */
+.v10-journey .editorSection--booking{display:block!important;margin-top:1rem}
+.v10-journey .editorSection--booking .v102BookingHead h3::after{
+  content:" · optional until suppliers are confirmed";
+  font-size:.72em;font-weight:600;color:#748079
+}
+
+@media(max-width:900px){
+  .v10ProgressNav{grid-template-columns:1fr 1fr;gap:.45rem}
+  .v10ProgressNav .v10StepLine{display:none}
+  .v10ProgressNav .v10MoreBtn{margin-left:0}
+}

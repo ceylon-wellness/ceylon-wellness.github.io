@@ -1109,7 +1109,7 @@ return (
             <div className="v10Readiness"><b>{(draft.itinerary||[]).length ? 'Journey in progress' : 'Ready to build'}</b><span>{(draft.itinerary||[]).length} planned day(s)</span></div>
           </div>
           <nav className="v10WorkspaceNav v10ProgressNav" aria-label="Journey workspace">
-            {[['overview','Request',requestComplete],['journey','Journey',journeyComplete],['price','Price',priceComplete],['booking','Bookings',bookingComplete],['terms','Review',journeyFinalised]].map(([key,label,done],idx)=><Fragment key={String(key)}><button type="button" className={workspaceTab===key?'active':done?'done':''} onClick={()=>setWorkspaceTab(key as any)}><span className="v10StepDot">{done?'✓':idx+1}</span><span>{label}</span></button>{idx<4&&<i className="v10StepLine"/>}</Fragment>)}
+            {[['overview','Traveller',requestComplete],['journey','Journey',journeyComplete],['price','Price',priceComplete],['terms','Ready to Send',journeyFinalised]].map(([key,label,done],idx)=><Fragment key={String(key)}><button type="button" className={workspaceTab===key?'active':done?'done':''} onClick={()=>setWorkspaceTab(key as any)}><span className="v10StepDot">{done?'✓':idx+1}</span><span>{label}</span></button>{idx<3&&<i className="v10StepLine"/>}</Fragment>)}
             <button type="button" className={`v10MoreBtn ${workspaceTab==='internal'?'active':''}`} onClick={()=>setWorkspaceTab('internal')}>••• <span>Admin</span></button>
           </nav>
           <div className="v102PersistentActions v102PersistentActions--top" role="region" aria-label="Journey actions">
@@ -1122,10 +1122,28 @@ return (
             <div className="v102SecondaryActions"><a href={wa(travelMsg)} target="_blank" rel="noreferrer"><MessageCircle/> WhatsApp</a><a href={emailLink(selected.email,`Ceylon Wellness · ${selected.journey_ref||'Journey'}`,travelMsg)}><Mail/> Email</a></div>
           </div>
           <div className={`adminEditGrid v10Workspace v10-${workspaceTab}`}>
-            <div className="editorSection editorSection--quickIntake">
-              <div className="editorSectionHeader"><div><span className="eyebrow">FAST START</span><h3>Paste agent request</h3><p>Paste the travel agent’s WhatsApp or email. Traveller facts are extracted so you only check what matters — nothing is invented.</p></div></div>
-              <textarea className="agentPasteBox" rows={5} value={agentPaste} onChange={e=>setAgentPaste(e.target.value)} placeholder={'Example: 2 adults, arrival 15 Nov, 10 nights, EUR 2500 total budget, 4 star, Ayurveda, nature, culture, beach, CMB'}/>
-              <div className="quickIntakeActions"><button type="button" className="button" onClick={parseAgentRequest} disabled={!agentPaste.trim()}><Sparkles/> Auto-fill request</button><span>Check the extracted facts, then continue to Journey.</span></div>
+            <div className="editorSection editorSection--quickIntake editorSection--received">
+              <div className="editorSectionHeader">
+                <div><span className="eyebrow">REQUEST RECEIVED</span><h3>Traveller details are already filled</h3><p>We use the information already sent with this request. Check it below and only complete anything that is still missing.</p></div>
+                <span className="receivedBadge"><CheckCircle2/> Ready to check</span>
+              </div>
+              <div className="receivedFacts">
+                <span className={draft.name?'done':'missing'}>{draft.name?'✓':'•'} Name</span>
+                <span className={draft.travel_dates?'done':'missing'}>{draft.travel_dates?'✓':'•'} Dates</span>
+                <span className={draft.travellers?'done':'missing'}>{draft.travellers?'✓':'•'} Travellers</span>
+                <span className={draft.budget_range?'done':'missing'}>{draft.budget_range?'✓':'•'} Budget</span>
+                <span className={draft.accommodation?'done':'missing'}>{draft.accommodation?'✓':'•'} Stay</span>
+                <span className={(draft.wellness_interests||[]).length||draft.journey_style?'done':'missing'}>{(draft.wellness_interests||[]).length||draft.journey_style?'✓':'•'} Preferences</span>
+              </div>
+              <p className="receivedHint"><b>Next:</b> add only operational details we cannot know yet — for example flight number, landing time or airport pickup confirmation.</p>
+              <details className="agentImportDetails">
+                <summary><Sparkles/> Import a separate agent WhatsApp or email <span>Optional</span></summary>
+                <div className="agentImportBody">
+                  <p>Use this only when a new request came from an external travel agent instead of Ask Ceylon. Existing facts are never invented.</p>
+                  <textarea className="agentPasteBox" rows={5} value={agentPaste} onChange={e=>setAgentPaste(e.target.value)} placeholder={'Example: 2 adults, arrival 15 Nov, 10 nights, EUR 2500 total budget, 4 star, Ayurveda, nature, culture, beach, CMB'}/>
+                  <div className="quickIntakeActions"><button type="button" className="button" onClick={parseAgentRequest} disabled={!agentPaste.trim()}><Sparkles/> Auto-fill from agent message</button><span>Review the extracted facts before saving.</span></div>
+                </div>
+              </details>
             </div>
             <div className="editorSection editorSection--traveller">
               <div className="editorSectionHeader">

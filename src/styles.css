@@ -141,3 +141,374 @@
 .v2JourneyPreview .quoteReady{border-radius:16px;background:rgba(22,58,43,.055)}
 @media(max-width:700px){.askCeylonV2:before{width:240px;height:240px}.askCeylonV2 .guideTop h1{letter-spacing:-.045em}.v2JourneyPreview .summaryGrid{padding:15px}.askCeylonV2 .guideNav{box-shadow:0 -10px 30px rgba(13,42,32,.05)}}
 @media(prefers-reduced-motion:reduce){.v2JourneyPreview .dayCard:hover,.askCeylonV2 .guideChoices button.selected{transform:none}}
+
+/* ASK CEYLON V2.1 — traveller-first 3-stage experience */
+.journeyStages{display:flex;align-items:center;gap:10px;margin:0 0 34px;padding:7px;background:#f4f1e9;border:1px solid rgba(22,58,43,.08);border-radius:999px;width:max-content;max-width:100%}
+.journeyStages>span{display:flex;align-items:center;gap:8px;padding:9px 15px;border-radius:999px;color:#7b827d;font-size:11px;font-weight:700;letter-spacing:.06em;white-space:nowrap;transition:.2s}
+.journeyStages>span.active{background:#fff;color:var(--forest);box-shadow:0 5px 18px rgba(13,42,32,.08)}
+.journeyStages>span.done{color:var(--forest)}
+.journeyStages svg{width:15px;height:15px}
+.stageDot{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.55}
+.askCeylonV2>.guideTop{margin-bottom:28px}
+.askCeylonV2 .v2StepMeta{justify-content:flex-start}
+.askCeylonV2 .v2StepMeta .eyebrow{max-width:none}
+.askCeylonV2 .freeBadge{background:#eef2eb;border-color:rgba(22,58,43,.08)}
+@media(max-width:700px){.journeyStages{width:100%;justify-content:space-between;gap:3px;padding:5px}.journeyStages>span{justify-content:center;flex:1;padding:8px 6px;font-size:9px;letter-spacing:.02em}.journeyStages svg{display:none}.askCeylonV2>.guideTop{margin-bottom:20px}}
+
+
+/* ASK CEYLON V2.1 — simplified traveller flow */
+.combinedSection{margin-top:28px;padding-top:24px;border-top:1px solid #ebe6dc}
+.guideMeBtn,.personaliseToggle{margin-top:18px;width:100%;display:flex;align-items:center;justify-content:center;gap:9px;border:1px dashed #9eae96;background:#f7f6f0;color:var(--forest);border-radius:14px;padding:14px 18px;font:600 13px 'DM Sans';cursor:pointer}
+.guideMeBtn svg,.personaliseToggle svg{width:17px}.personaliseToggle span{margin-left:auto;font-size:20px;font-weight:400}
+.personalisePanel{margin-top:14px;padding:20px;border:1px solid #ddd6c8;border-radius:16px;background:#faf8f2;display:grid;gap:22px}
+.personalisePanel .miniTitle{margin-top:0}.personalisePanel .inlineChoices{margin-top:10px}
+.askCeylonV2 .combinedSection .guideChoices{margin-top:12px}
+@media(max-width:700px){.combinedSection{margin-top:22px;padding-top:20px}.personalisePanel{padding:16px}.guideMeBtn,.personaliseToggle{min-height:48px}}
+
+/* ASK CEYLON V2.1 — simple traveller journey concept */
+.journeyConcept{overflow:hidden}
+.conceptHero{display:flex;justify-content:space-between;gap:28px;align-items:flex-start;background:var(--forest);color:#fff;border-radius:18px;padding:clamp(24px,4vw,38px);margin-bottom:24px}
+.conceptHero h2{font:normal clamp(34px,4vw,54px)/1.02 'DM Serif Display',serif;margin:8px 0 12px}
+.conceptHero p{margin:0;max-width:760px;color:#e3ebe6;line-height:1.7}
+.conceptHero>svg{width:44px;height:44px;color:#e0c78f;flex:none}
+.journeyFlow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr auto 1fr auto 1.25fr;align-items:stretch;gap:8px;margin:26px 0}
+.journeyFlow>div{min-width:0;border:1px solid #e2ded3;background:#fff;padding:18px 12px;border-radius:14px;display:flex;flex-direction:column;gap:7px}
+.journeyFlow>div svg{width:21px;color:var(--forest)}
+.journeyFlow>div b{font-size:11px;letter-spacing:.08em;color:var(--forest)}
+.journeyFlow>div span{font-size:11px;line-height:1.4;color:#69736c}
+.journeyFlow>i{align-self:center;font-style:normal;color:#a59b84}
+.conceptWhy,.humanPlanningNote{display:flex;gap:14px;align-items:flex-start;border-radius:16px;padding:20px;margin:20px 0}
+.conceptWhy{background:#f5f0e6}
+.humanPlanningNote{background:#edf3ee;border:1px solid rgba(22,58,43,.09)}
+.conceptWhy>svg,.humanPlanningNote>svg{width:22px;flex:none;color:var(--forest)}
+.conceptWhy p,.humanPlanningNote p{margin:6px 0 0;line-height:1.65;color:#5f6962;font-size:13px}
+.conceptBrief{margin-top:18px}
+.conceptActions{display:flex;justify-content:flex-end;gap:12px;align-items:center;margin-top:22px}
+.conceptActions .outlineBtn,.conceptActions .button{display:inline-flex;align-items:center;gap:8px}
+.conceptActions svg{width:17px}
+@media(max-width:900px){.journeyFlow{grid-template-columns:1fr}.journeyFlow>i{transform:rotate(90deg);justify-self:center}.conceptActions{flex-direction:column}.conceptActions .outlineBtn,.conceptActions .button{width:100%;justify-content:center}}
+@media(max-width:600px){.conceptHero{flex-direction:column}.conceptHero>svg{order:-1}.conceptWhy,.humanPlanningNote{padding:17px}.journeyFlow>div{padding:15px}}
+
+/* ASK CEYLON V2.1 — traveller clarity polish */
+.journeyConcept .conceptContact{padding:22px}
+.journeyConcept .conceptContact .contactCaptureHead p{max-width:680px}
+.journeyConcept .compactPrivacy{margin-top:10px;padding:10px 12px}
+.journeyConcept .compactPrivacy span{font-size:11px;line-height:1.5}
+@media(max-width:900px){
+  .journeyConcept .journeyFlow{position:relative;display:flex;flex-direction:column;gap:0;padding-left:8px}
+  .journeyConcept .journeyFlow>div{position:relative;margin-left:24px;border:0;border-left:2px solid #d8dfd9;border-radius:0;padding:12px 12px 14px 22px;background:transparent}
+  .journeyConcept .journeyFlow>div:last-child{border-left-color:transparent}
+  .journeyConcept .journeyFlow>div svg{position:absolute;left:-12px;top:12px;background:#fbfaf6;padding:4px;width:22px;height:22px;border-radius:50%}
+  .journeyConcept .journeyFlow>i{display:none}
+  .journeyConcept .journeyFlow>div b{font-size:12px}
+  .journeyConcept .journeyFlow>div span{font-size:12px}
+}
+@media(max-width:600px){
+  .journeyConcept .conceptContact{padding:18px 15px}
+  .journeyConcept .deliveryRow{align-items:flex-start}
+}
+
+/* ASK CEYLON V2.1 — service-led budget journey build */
+.servicePromise,.quote24{display:flex;gap:14px;align-items:flex-start;border-radius:16px;padding:18px 20px;margin-bottom:20px;background:#edf3ee;border:1px solid rgba(22,58,43,.1)}
+.servicePromise svg,.quote24 svg{width:23px;flex:none;color:var(--forest)}
+.servicePromise b,.quote24 b{display:block;color:var(--forest);margin-bottom:4px}
+.servicePromise span,.quote24 span{font-size:12px;line-height:1.55;color:#647069}
+.durationChoice{margin:18px 0}
+.compactDates{margin-top:16px}
+.shapeBudget{display:grid;gap:18px}
+.localValueCard{display:flex;gap:14px;align-items:flex-start;background:#f5f0e6;border-radius:18px;padding:20px}
+.localValueCard svg{width:24px;flex:none;color:var(--forest)}
+.localValueCard b{font-size:17px;color:var(--forest)}
+.localValueCard p{margin:6px 0 0;line-height:1.65;color:#626b65;font-size:13px}
+.budgetEntry{display:grid;grid-template-columns:minmax(140px,.4fr) minmax(220px,1fr);gap:14px}
+.budgetEntry label{display:grid;gap:7px;font-size:12px;font-weight:700;color:var(--forest)}
+.budgetEntry select,.budgetEntry input{width:100%;min-height:48px;border:1px solid #d8d5ca;border-radius:12px;background:#fff;padding:0 13px;font:inherit}
+.shapeBudget .notesField span{display:block;margin-bottom:7px;font-weight:700;color:var(--forest)}
+.shapeBudget .notesField small{font-weight:400;color:#7c847f}
+@media(max-width:650px){.budgetEntry{grid-template-columns:1fr}.servicePromise,.quote24,.localValueCard{padding:16px}}
+
+/* =========================================================
+   CEYLON GLASS — Ask Ceylon premium traveller experience
+   macOS-inspired restraint, original Ceylon Wellness identity
+   Scope: .askCeylonV2 only. Admin/Home/PDF remain untouched.
+   ========================================================= */
+.askCeylonV2.ceylonGlass{
+  --cg-ink:#17382c;
+  --cg-ink-soft:#52645c;
+  --cg-gold:#b4975a;
+  --cg-line:rgba(24,57,45,.11);
+  --cg-glass:rgba(255,255,255,.68);
+  --cg-glass-strong:rgba(255,255,255,.84);
+  --cg-ivory:#f8f6ef;
+  position:relative;
+  isolation:isolate;
+  max-width:1180px;
+  margin:28px auto 42px;
+  padding:clamp(18px,3.2vw,38px);
+  border:1px solid rgba(255,255,255,.72);
+  border-radius:32px;
+  background:
+    radial-gradient(circle at 12% 0%,rgba(223,233,225,.88),transparent 34%),
+    radial-gradient(circle at 92% 12%,rgba(236,224,194,.40),transparent 28%),
+    linear-gradient(145deg,rgba(250,249,245,.96),rgba(242,246,242,.92));
+  box-shadow:0 30px 80px rgba(19,48,37,.11),0 2px 10px rgba(19,48,37,.04);
+  overflow:hidden;
+}
+.askCeylonV2.ceylonGlass:before{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(115deg,rgba(255,255,255,.62),transparent 38%,rgba(255,255,255,.20));
+}
+.askCeylonV2.ceylonGlass .journeyStages{
+  position:sticky;top:12px;z-index:8;
+  width:max-content;max-width:100%;margin:0 auto 32px;padding:7px;
+  display:flex;gap:4px;
+  border:1px solid rgba(255,255,255,.88);border-radius:999px;
+  background:rgba(250,250,247,.74);
+  box-shadow:0 12px 34px rgba(18,47,36,.09);
+  backdrop-filter:blur(22px) saturate(140%);
+  -webkit-backdrop-filter:blur(22px) saturate(140%);
+}
+.askCeylonV2.ceylonGlass .journeyStages>span{
+  min-height:38px;padding:0 16px;border-radius:999px;
+  display:flex;align-items:center;gap:7px;
+  font-size:11px;font-weight:700;letter-spacing:.035em;color:#728078;
+  transition:background .25s ease,color .25s ease,transform .25s ease,box-shadow .25s ease;
+}
+.askCeylonV2.ceylonGlass .journeyStages>span.active{
+  color:#fff;background:linear-gradient(145deg,#214d3b,#17382c);
+  box-shadow:0 7px 18px rgba(23,56,44,.20);
+}
+.askCeylonV2.ceylonGlass .journeyStages>span.done{color:var(--cg-ink)}
+.askCeylonV2.ceylonGlass .guideTop{
+  align-items:flex-start;gap:26px;margin:0 auto 28px;max-width:1040px;
+}
+.askCeylonV2.ceylonGlass .guideTop h1{
+  max-width:790px;margin:7px 0 12px;
+  font-size:clamp(38px,5.4vw,68px);line-height:.98;letter-spacing:-.035em;
+  text-wrap:balance;color:var(--cg-ink);
+}
+.askCeylonV2.ceylonGlass .guideTop p{
+  max-width:720px;font-size:15px;line-height:1.7;color:var(--cg-ink-soft);
+}
+.askCeylonV2.ceylonGlass .eyebrow{letter-spacing:.13em;font-size:10px;color:#65766e}
+.askCeylonV2.ceylonGlass .freeBadge.glassTrust{
+  flex:none;border:1px solid rgba(255,255,255,.9);border-radius:999px;
+  background:rgba(255,255,255,.64);box-shadow:0 9px 25px rgba(23,56,44,.07);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+.askCeylonV2.ceylonGlass .guideChoices{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;
+}
+.askCeylonV2.ceylonGlass .guideChoices button,
+.askCeylonV2.ceylonGlass .inlineChoices button{
+  border:1px solid var(--cg-line);border-radius:18px;
+  background:rgba(255,255,255,.67);color:var(--cg-ink);
+  box-shadow:0 5px 18px rgba(23,56,44,.035);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background .18s ease;
+}
+@media(hover:hover){
+  .askCeylonV2.ceylonGlass .guideChoices button:hover,
+  .askCeylonV2.ceylonGlass .inlineChoices button:hover{
+    transform:translateY(-2px);border-color:rgba(23,56,44,.24);
+    box-shadow:0 12px 26px rgba(23,56,44,.08);background:rgba(255,255,255,.88);
+  }
+}
+.askCeylonV2.ceylonGlass .guideChoices button.selected,
+.askCeylonV2.ceylonGlass .inlineChoices button.selected{
+  border-color:rgba(23,56,44,.52);background:rgba(230,239,232,.88);
+  box-shadow:inset 0 0 0 1px rgba(23,56,44,.10),0 10px 25px rgba(23,56,44,.07);
+}
+.askCeylonV2.ceylonGlass .travelForm,
+.askCeylonV2.ceylonGlass .shapeBudget,
+.askCeylonV2.ceylonGlass .resultCard{
+  border:1px solid rgba(255,255,255,.86);border-radius:26px;
+  background:rgba(255,255,255,.58);box-shadow:0 18px 50px rgba(22,52,41,.07);
+  backdrop-filter:blur(22px) saturate(120%);-webkit-backdrop-filter:blur(22px) saturate(120%);
+}
+.askCeylonV2.ceylonGlass .travelForm,
+.askCeylonV2.ceylonGlass .shapeBudget{padding:clamp(18px,3vw,30px)}
+.askCeylonV2.ceylonGlass .combinedSection,
+.askCeylonV2.ceylonGlass .personalisePanel{
+  border-color:var(--cg-line);border-radius:20px;background:rgba(248,248,244,.64);
+}
+.askCeylonV2.ceylonGlass input,
+.askCeylonV2.ceylonGlass select,
+.askCeylonV2.ceylonGlass textarea{
+  border:1px solid rgba(23,56,44,.14);border-radius:14px;background:rgba(255,255,255,.82);
+  color:var(--cg-ink);box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+  transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;
+}
+.askCeylonV2.ceylonGlass input:focus,
+.askCeylonV2.ceylonGlass select:focus,
+.askCeylonV2.ceylonGlass textarea:focus{
+  outline:none;border-color:rgba(23,56,44,.48);background:#fff;
+  box-shadow:0 0 0 4px rgba(31,78,59,.09);
+}
+.askCeylonV2.ceylonGlass .servicePromise,
+.askCeylonV2.ceylonGlass .glassQuote,
+.askCeylonV2.ceylonGlass .glassValue,
+.askCeylonV2.ceylonGlass .conceptWhy,
+.askCeylonV2.ceylonGlass .humanPlanningNote{
+  border:1px solid rgba(255,255,255,.86);border-radius:20px;
+  background:linear-gradient(145deg,rgba(255,255,255,.74),rgba(236,242,236,.64));
+  box-shadow:0 10px 30px rgba(22,52,41,.055);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+.askCeylonV2.ceylonGlass .glassValue{
+  background:linear-gradient(145deg,rgba(248,243,229,.88),rgba(255,255,255,.68));
+}
+.askCeylonV2.ceylonGlass .button{
+  min-height:48px;border-radius:14px;border:0;
+  background:linear-gradient(145deg,#214d3b,#17382c);color:#fff;
+  box-shadow:0 10px 24px rgba(23,56,44,.17);
+  transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;
+}
+.askCeylonV2.ceylonGlass .outlineBtn,
+.askCeylonV2.ceylonGlass .backBtn,
+.askCeylonV2.ceylonGlass .guideMeBtn,
+.askCeylonV2.ceylonGlass .personaliseToggle{
+  border-radius:14px;border:1px solid rgba(23,56,44,.13);
+  background:rgba(255,255,255,.70);color:var(--cg-ink);
+}
+@media(hover:hover){
+ .askCeylonV2.ceylonGlass .button:hover{transform:translateY(-1px);box-shadow:0 14px 30px rgba(23,56,44,.21);filter:brightness(1.03)}
+}
+.askCeylonV2.ceylonGlass .conceptHero{
+  border-radius:24px;padding:clamp(26px,4vw,44px);
+  background:
+    radial-gradient(circle at 90% 10%,rgba(211,188,132,.18),transparent 30%),
+    linear-gradient(145deg,#214d3b,#122f25);
+  box-shadow:0 20px 45px rgba(18,47,37,.18);
+}
+.askCeylonV2.ceylonGlass .conceptHero h2{letter-spacing:-.025em}
+.askCeylonV2.ceylonGlass .journeyFlow>div{
+  border-color:rgba(23,56,44,.10);background:rgba(255,255,255,.72);
+  box-shadow:0 7px 20px rgba(23,56,44,.045);
+}
+.askCeylonV2.ceylonGlass .contactCapture{
+  border:1px solid rgba(23,56,44,.10);border-radius:22px;background:rgba(255,255,255,.72);
+  box-shadow:0 14px 38px rgba(23,56,44,.06);
+}
+.askCeylonV2.ceylonGlass .privacyConsent{border-radius:14px;background:rgba(247,248,244,.72)}
+.askCeylonV2.ceylonGlass .guideNav{
+  position:sticky;bottom:14px;z-index:7;margin-top:24px;padding:10px;
+  border:1px solid rgba(255,255,255,.86);border-radius:20px;
+  background:rgba(249,249,246,.76);box-shadow:0 14px 36px rgba(20,49,38,.10);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+.askCeylonV2.ceylonGlass .budgetEntry select,
+.askCeylonV2.ceylonGlass .budgetEntry input{min-height:52px}
+.askCeylonV2.ceylonGlass .miniTitle{color:var(--cg-ink);letter-spacing:.01em}
+@media(max-width:760px){
+  .askCeylonV2.ceylonGlass{margin:12px 10px 26px;padding:17px 14px 22px;border-radius:24px}
+  .askCeylonV2.ceylonGlass .journeyStages{top:7px;margin-bottom:24px;width:100%;justify-content:center}
+  .askCeylonV2.ceylonGlass .journeyStages>span{padding:0 10px;justify-content:center;flex:1;font-size:10px}
+  .askCeylonV2.ceylonGlass .guideTop{display:block}
+  .askCeylonV2.ceylonGlass .guideTop h1{font-size:clamp(36px,11vw,50px)}
+  .askCeylonV2.ceylonGlass .freeBadge.glassTrust{width:max-content;max-width:100%;margin-top:16px}
+  .askCeylonV2.ceylonGlass .guideChoices{grid-template-columns:1fr 1fr;gap:9px}
+  .askCeylonV2.ceylonGlass .guideChoices button{min-height:62px;padding:12px}
+  .askCeylonV2.ceylonGlass .travelForm,.askCeylonV2.ceylonGlass .shapeBudget{border-radius:21px}
+  .askCeylonV2.ceylonGlass .guideNav{bottom:8px}
+}
+@media(max-width:420px){
+  .askCeylonV2.ceylonGlass .journeyStages>span{padding:0 7px;font-size:9px}
+  .askCeylonV2.ceylonGlass .guideChoices{grid-template-columns:1fr}
+  .askCeylonV2.ceylonGlass .guideTop h1{font-size:38px}
+}
+@media(prefers-reduced-motion:reduce){
+  .askCeylonV2.ceylonGlass *{scroll-behavior:auto!important;transition:none!important}
+}
+
+/* GDPR consent — clear, readable, touch-safe */
+.askCeylonV2.ceylonGlass .gdprConsentBlock{margin-top:14px;display:grid;gap:10px}
+.askCeylonV2.ceylonGlass .privacyConsent{
+  width:100%;box-sizing:border-box;margin:0;padding:15px 17px;
+  display:grid;grid-template-columns:20px minmax(0,1fr);gap:12px;align-items:start;
+  border:1px solid rgba(23,56,44,.14);border-radius:16px;background:rgba(248,249,245,.86);
+  color:#33443d;font-size:12.5px;line-height:1.58;cursor:pointer;
+}
+.askCeylonV2.ceylonGlass .privacyConsent input[type="checkbox"]{
+  appearance:auto;-webkit-appearance:checkbox;width:18px;height:18px;min-width:18px;
+  margin:1px 0 0;padding:0;box-shadow:none;accent-color:#17382c;cursor:pointer;
+}
+.askCeylonV2.ceylonGlass .privacyConsent span{min-width:0}
+.askCeylonV2.ceylonGlass .privacyConsent b{color:#17382c}
+.askCeylonV2.ceylonGlass .privacyConsent a{
+  color:#17382c;font-weight:700;text-decoration:underline;text-underline-offset:2px;
+  white-space:normal;overflow-wrap:normal;
+}
+.askCeylonV2.ceylonGlass .compactPrivacy{
+  margin:0;padding:10px 14px;display:flex;gap:9px;align-items:flex-start;
+  border:0;background:transparent;color:#647069;font-size:11px;line-height:1.5;
+}
+.askCeylonV2.ceylonGlass .compactPrivacy svg{width:16px;height:16px;min-width:16px;margin-top:1px;color:#17382c}
+@media(max-width:650px){
+  .askCeylonV2.ceylonGlass .privacyConsent{padding:14px;grid-template-columns:19px minmax(0,1fr);gap:10px}
+}
+
+/* Ask Ceylon V2.1 — post-submit trust / thank-you experience */
+.askCeylonV2.ceylonGlass .journeyThankYou{display:grid;gap:16px;margin-top:18px}
+.askCeylonV2.ceylonGlass .thankYouHero,.askCeylonV2.ceylonGlass .trustPromise,.askCeylonV2.ceylonGlass .thankYouNext,.askCeylonV2.ceylonGlass .thankYouClosing{border:1px solid rgba(23,70,53,.12);border-radius:22px;background:rgba(255,255,255,.68);box-shadow:0 18px 50px rgba(24,55,43,.07);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.askCeylonV2.ceylonGlass .thankYouHero{padding:28px;background:linear-gradient(145deg,rgba(19,65,48,.97),rgba(24,83,60,.93));color:#fff}
+.askCeylonV2.ceylonGlass .thankYouHero .eyebrow{color:rgba(255,255,255,.68)}
+.askCeylonV2.ceylonGlass .thankYouHero h2{margin:.45rem 0 .7rem;font-size:clamp(2rem,5vw,3.4rem);line-height:.96;color:#fff}
+.askCeylonV2.ceylonGlass .thankYouHero p{max-width:680px;margin:0;color:rgba(255,255,255,.84);line-height:1.7}
+.askCeylonV2.ceylonGlass .trustPromise{padding:24px}
+.askCeylonV2.ceylonGlass .trustPromise h3,.askCeylonV2.ceylonGlass .thankYouNext h3{margin:0 0 16px;font-size:1.25rem}
+.askCeylonV2.ceylonGlass .trustPromiseGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.askCeylonV2.ceylonGlass .trustPromiseGrid article{display:grid;grid-template-columns:22px 1fr;gap:4px 10px;padding:16px;border:1px solid rgba(23,70,53,.1);border-radius:16px;background:rgba(250,249,244,.72)}
+.askCeylonV2.ceylonGlass .trustPromiseGrid article svg{grid-row:1/3;width:19px;height:19px;color:#1c6047}
+.askCeylonV2.ceylonGlass .trustPromiseGrid article b{font-size:.92rem;color:#173e30}
+.askCeylonV2.ceylonGlass .trustPromiseGrid article span{font-size:.79rem;line-height:1.55;color:#66736d}
+.askCeylonV2.ceylonGlass .thankYouNext{padding:22px}
+.askCeylonV2.ceylonGlass .thankYouNext>div{display:grid;gap:8px}
+.askCeylonV2.ceylonGlass .thankYouNext span{display:flex;align-items:center;gap:10px;font-size:.84rem;color:#53625c}
+.askCeylonV2.ceylonGlass .thankYouNext span b{display:grid;place-items:center;flex:0 0 25px;height:25px;border-radius:50%;background:#174b38;color:#fff;font-size:.72rem}
+.askCeylonV2.ceylonGlass .thankYouNext p{margin:16px 0 0;padding-top:14px;border-top:1px solid rgba(23,70,53,.1);font-size:.82rem;color:#174b38}
+.askCeylonV2.ceylonGlass .thankYouClosing{display:flex;gap:14px;align-items:flex-start;padding:20px 22px;background:rgba(239,245,238,.72)}
+.askCeylonV2.ceylonGlass .thankYouClosing svg{flex:0 0 22px;color:#1c6047}
+.askCeylonV2.ceylonGlass .thankYouClosing h3{margin:0 0 4px;font-size:1.08rem;color:#173e30}
+.askCeylonV2.ceylonGlass .thankYouClosing p{margin:0;color:#68746f;font-size:.82rem}
+@media(max-width:680px){.askCeylonV2.ceylonGlass .trustPromiseGrid{grid-template-columns:1fr}.askCeylonV2.ceylonGlass .thankYouHero{padding:22px 18px}.askCeylonV2.ceylonGlass .trustPromise,.askCeylonV2.ceylonGlass .thankYouNext{padding:18px}.askCeylonV2.ceylonGlass .journeyThankYou .conceptActions{display:grid;grid-template-columns:1fr}.askCeylonV2.ceylonGlass .journeyThankYou .conceptActions>*{width:100%;justify-content:center}}
+
+
+/* ASK CEYLON V2.1 — ONE DECISION PER SCREEN */
+.askCeylonV2.ceylonGlass{
+  min-height:min(760px,calc(100svh - 132px));
+  display:flex;
+  flex-direction:column;
+}
+.askCeylonV2.ceylonGlass .guideTop{flex:0 0 auto}
+.askCeylonV2.ceylonGlass .v2StepMeta{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.askCeylonV2.ceylonGlass .microProgress{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.62;font-weight:700}
+.askCeylonV2.ceylonGlass .guideChoices,
+.askCeylonV2.ceylonGlass .travelForm,
+.askCeylonV2.ceylonGlass .shapeBudget,
+.askCeylonV2.ceylonGlass .specialRequestStep{margin-top:22px}
+.askCeylonV2.ceylonGlass .oneDecisionStep{max-width:100%}
+.askCeylonV2.ceylonGlass .guideNav{margin-top:auto;padding-top:18px}
+.askCeylonV2.ceylonGlass .paceChoices{grid-template-columns:repeat(3,minmax(0,1fr))}
+.askCeylonV2.ceylonGlass .specialRequestStep .notesField textarea{min-height:150px}
+.askCeylonV2.ceylonGlass .resultCard.journeyConcept{margin-top:22px}
+
+@media (min-width: 821px){
+  .askV2Page .askCeylonV2.ceylonGlass{max-height:calc(100svh - 110px);overflow:auto;scrollbar-width:thin}
+  .askCeylonV2.ceylonGlass .guideChoices.interests{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+  .askCeylonV2.ceylonGlass .guideChoices.interests button{min-height:86px;padding:14px}
+  .askCeylonV2.ceylonGlass .stayChoices{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width: 820px){
+  .askV2Page .askCeylonV2.ceylonGlass{min-height:calc(100svh - 92px);border-radius:26px;padding-bottom:18px}
+  .askCeylonV2.ceylonGlass .guideTop h1{font-size:clamp(2.35rem,12vw,4.2rem);line-height:.93}
+  .askCeylonV2.ceylonGlass .guideChoices{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .askCeylonV2.ceylonGlass .guideChoices.interests{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .askCeylonV2.ceylonGlass .paceChoices{grid-template-columns:1fr}
+  .askCeylonV2.ceylonGlass .guideNav{position:sticky;bottom:8px;z-index:8;padding:10px;border:1px solid rgba(255,255,255,.65);border-radius:18px;background:rgba(250,248,241,.84);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+}
+@media (max-height: 720px) and (min-width:821px){
+  .askCeylonV2.ceylonGlass .guideTop h1{font-size:clamp(2.5rem,5.4vw,4.8rem)}
+  .askCeylonV2.ceylonGlass .guideTop{gap:14px}
+  .askCeylonV2.ceylonGlass .guideChoices{margin-top:14px}
+}

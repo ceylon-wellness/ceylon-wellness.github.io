@@ -834,3 +834,24 @@
     margin:8px auto 24px!important;
   }
 }
+
+
+/* V2.1 — LKR snapshot FX + bank/payment panel */
+.fxConverterPanel,.bankPaymentPanel{margin-top:18px;padding:20px;border:1px solid rgba(29,72,54,.16);border-radius:18px;background:rgba(255,255,255,.72);display:grid;gap:16px}.fxConverterPanel h4,.bankPaymentPanel h4{margin:3px 0 4px}.fxConverterPanel label,.bankPaymentPanel label{display:grid;gap:7px;font-size:.88rem}.fxConverterPanel select,.fxConverterPanel input,.bankPaymentPanel select,.bankPaymentPanel input{width:100%;box-sizing:border-box;border:1px solid rgba(25,55,44,.18);border-radius:11px;padding:11px 12px;background:#fff}.fxRateInput{display:grid;grid-template-columns:auto minmax(110px,1fr) auto;gap:10px;align-items:center}.fxPreview{display:grid;grid-template-columns:1fr auto;gap:7px 16px;padding:14px;border-radius:14px;background:rgba(22,58,43,.06)}.fxPreview strong{font-size:1.15rem;color:#163a2b}.bankPaymentGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.bankPaymentWide{grid-column:1/-1}@media(max-width:760px){.bankPaymentGrid{grid-template-columns:1fr}.bankPaymentWide{grid-column:auto}.fxRateInput{grid-template-columns:1fr}.fxPreview{grid-template-columns:1fr}}
+
+/* Ceylon Wellness Admin — final simple pricing flow */
+.v102PersistentActions--top{position:sticky;top:10px;z-index:20;margin:12px 0 18px;box-shadow:0 12px 30px rgba(25,54,43,.12)}
+.simplePriceStep{display:grid;grid-template-columns:48px 1fr;gap:16px;padding:20px;margin:16px 0;border:1px solid rgba(31,82,63,.14);border-radius:18px;background:#fff}
+.simplePriceStep--final{border-color:rgba(31,82,63,.34);background:linear-gradient(135deg,#fbfff9,#f3f8ef)}
+.simpleStepNo{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#1f523f;color:#fff;font-weight:800;font-size:18px}
+.simpleStepBody h4{margin:0 0 5px;font-size:18px}.simpleStepBody>p{margin:0 0 14px;color:#65736c}
+.simpleCostTable .costTableHead,.simpleCostRow{grid-template-columns:1.05fr 1.65fr .55fr 1.15fr 1.15fr 40px}
+.serviceCell,.rateCell{display:grid;gap:6px}.rateCell small{font-size:11px;color:#748078}.simpleCostRow strong{align-self:center}
+.simpleTotal{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;padding:14px 16px;border-radius:14px;background:#f4f6f2}.simpleTotal strong{font-size:20px}.simpleTotal small{margin-left:auto;color:#7a817d}
+.markupPresets{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.markupPresets button{border:1px solid #cbd8d1;background:#fff;border-radius:999px;padding:9px 14px;font-weight:700}.markupPresets button.active{background:#1f523f;color:#fff;border-color:#1f523f}.markupPresets label{display:flex;align-items:center;gap:6px;font-weight:700}.markupPresets input{width:90px}
+.simpleMath{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}.simpleMath span{padding:12px;border-radius:12px;background:#f6f7f4;display:grid;gap:4px}.simpleMath b{font-size:17px}
+.simpleFxGrid{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:12px;align-items:end}.simpleFxGrid label{display:grid;gap:6px}.simpleSuggestion{padding:12px;border-radius:12px;background:#f6f7f4;display:grid;gap:4px}.simpleSuggestion strong{font-size:20px}
+.finalPriceEditor{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.finalPriceEditor>span{font-weight:800;font-size:18px}.finalPriceEditor input{font-size:22px;font-weight:800;max-width:260px;padding:12px 14px}.travellerPricePreview{margin-top:14px;padding:16px;border-radius:14px;background:#173f31;color:#fff;display:grid;gap:4px}.travellerPricePreview strong{font-size:26px}.travellerPricePreview small{opacity:.78}.simpleSavePrice{margin-top:14px}
+.v102DangerZone{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px;padding:14px 16px;border:1px dashed rgba(160,57,57,.28);border-radius:14px;color:#6d5b5b}
+@media(max-width:900px){.simpleCostTable .costTableHead{display:none}.simpleCostRow{grid-template-columns:1fr 1fr}.simpleCostRow>*{min-width:0}.simpleMath,.simpleFxGrid{grid-template-columns:1fr}.v102PersistentActions--top{position:static}.simpleTotal small{margin-left:0}}
+@media(max-width:620px){.simplePriceStep{grid-template-columns:1fr}.simpleStepNo{width:36px;height:36px}.simpleCostRow{grid-template-columns:1fr}.finalPriceEditor{align-items:stretch}.finalPriceEditor input{max-width:none;width:100%}.v102DangerZone{align-items:flex-start;flex-direction:column}}

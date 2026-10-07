@@ -103,6 +103,9 @@ const downloadTravellerPdf=async(payload:{
   priceExcludes?:string|null;
   paymentInstructions?:string|null;
   cancellationTerms?:string|null;
+  priceBreakdown?:Array<{place?:string|null;label?:string|null;category?:string|null;qty?:number|null;unit?:string|null;supplierLkr?:number|null}>;
+  markupPercent?:number|null;
+  fxRateLkrPerQuoteCurrency?:number|null;
 })=>{
   if(typeof window==='undefined')return;
   if(!hasValidFinalPricing(payload)){
@@ -222,6 +225,23 @@ const downloadTravellerPdf=async(payload:{
   const excludedText=cleanList(payload.priceExcludes) || 'No exclusions have been added yet.';
   const paymentText=cleanList(payload.paymentInstructions) || 'Please confirm the preferred payment method and timing with Ceylon Wellness before final confirmation.';
   const cancellationText=cleanList(payload.cancellationTerms) || 'Final cancellation and refund conditions will be confirmed before payment is received.';
+  const markupPercent=Math.max(0,Number(payload.markupPercent||0));
+  const fxRate=(String(payload.currency||'').toUpperCase()==='LKR')?1:Math.max(0,Number(payload.fxRateLkrPerQuoteCurrency||0));
+  const rawBreakdown=(payload.priceBreakdown||[]).filter(item=>Number(item.supplierLkr||0)>0);
+  const calculatedBreakdownTotal=rawBreakdown.reduce((sum,item)=>sum+(Number(item.supplierLkr||0)*(1+markupPercent/100)/(fxRate||1)),0);
+  const finalTotalForBreakdown=parseNumber(payload.totalPrice);
+  const commercialScale=calculatedBreakdownTotal>0&&finalTotalForBreakdown>0?finalTotalForBreakdown/calculatedBreakdownTotal:1;
+  const travellerBreakdown=rawBreakdown.map(item=>({
+    place:safeLabel(item.place,'Journey-wide'),
+    label:safeLabel(item.label,item.category||'Journey service'),
+    category:safeLabel(item.category,'Service'),
+    amount:(Number(item.supplierLkr||0)*(1+markupPercent/100)/(fxRate||1))*commercialScale
+  }));
+  const groupedBreakdown=Array.from(travellerBreakdown.reduce((map,item)=>{
+    const key=item.place||'Journey-wide';
+    const current=map.get(key)||[];
+    current.push(item);map.set(key,current);return map;
+  },new Map<string,typeof travellerBreakdown>()));
   const itinerary=(payload.itinerary || []).filter((day)=>isMeaningfulText(day.day as unknown as string) || isMeaningfulText(day.place) || isMeaningfulText(day.focus) || isMeaningfulText(day.activity) || isMeaningfulText(day.stay)).map((day)=>({
     day: safeText(day.day,'Day'),
     place: safeLabel(day.place,'Location TBC'),
@@ -529,139 +549,93 @@ const downloadTravellerPdf=async(payload:{
     });
   });
 
-  // PAGE 4 — calm commercial close, not crowded
+  // PAGE 4 — transparent traveller quotation and payment
   doc.addPage();
   drawHeader(4, safeRef);
 
   doc.setTextColor(18,32,29);
   doc.setFont(pdfFont,'bold');
-  doc.setFontSize(19);
-  doc.text('Journey arrangements', pageGridX, 96);
-
-  const arrangementCards = [
-    ['Accommodation', statusAccommodation],
-    ['Private transport', statusTransport],
-    ['Wellness & experiences', statusWellness]
-  ];
-  arrangementCards.forEach(([label, status], index)=>{
-    const x = pageGridX + index * (moneyColumnWidth + 18);
-    doc.setFillColor(241,243,239);
-    doc.roundedRect(x, 118, moneyColumnWidth, 52, 7, 7, 'F');
-    doc.setDrawColor(220,228,220);
-    doc.roundedRect(x, 118, moneyColumnWidth, 52, 7, 7, 'S');
-    doc.setTextColor(114,126,118);
-    doc.setFont(pdfFont,'bold');
-    doc.setFontSize(7.2);
-    doc.text(String(label), x + 12, 138);
-    doc.setTextColor(25,32,29);
-    doc.setFont(pdfFont,'normal');
-    doc.setFontSize(8.8);
-    doc.text(String(status), x + 12, 154);
-  });
-
-  doc.setDrawColor(219,220,216);
-  doc.line(pageGridX, 192, width - pageGridX, 192);
-
-  const leftListX = pageGridX;
-  const rightListX = width / 2 + 18;
-  const page4ColumnGap = 22;
-  const page4ColumnW = (pageGridW - page4ColumnGap) / 2;
-  const valueColWidth = page4ColumnW;
-
-  doc.setTextColor(18,32,29);
-  doc.setFont(pdfFont,'bold');
-  doc.setFontSize(12);
-  doc.text('Included', leftListX, 214);
-  doc.text('Not included', rightListX, 214);
-
-  const includeItems = includedText.split(/\s*\n\s*|\s*•\s*|\s*;\s*/).filter(Boolean).slice(0, 6);
-  includeItems.forEach((item, index)=>{
-    const y = 236 + index * 18;
-    doc.setTextColor(22,51,45);
-    doc.setFont(pdfFont,'normal');
-    doc.setFontSize(8.7);
-    doc.text('✓', leftListX, y);
-    doc.text(item, leftListX + 14, y, {maxWidth: page4ColumnW - 20});
-  });
-
-  const excludeItems = excludedText.split(/\s*\n\s*|\s*•\s*|\s*;\s*/).filter(Boolean).slice(0, 6);
-  excludeItems.forEach((item, index)=>{
-    const y = 236 + index * 18;
-    doc.setTextColor(52,60,57);
-    doc.setFont(pdfFont,'normal');
-    doc.setFontSize(8.7);
-    doc.text('–', rightListX, y);
-    doc.text(item, rightListX + 14, y, {maxWidth: page4ColumnW - 20});
-  });
-
-  doc.setFillColor(238,242,236);
-  doc.roundedRect(pageGridX, 372, pageGridW, 74, 8, 8, 'F');
-  doc.setTextColor(18,32,29);
-  doc.setFont(pdfFont,'bold');
-  doc.setFontSize(12);
-  doc.text('Your journey investment', pageGridX + 16, 396);
-
-  const investmentX = [pageGridX + 16, pageGridX + 245, pageGridX + 420];
-  const investmentRows = [
-    {value: totalValue, label: 'Total'},
-    {value: reserveValue, label: 'Reservation'},
-    {value: balanceValue, label: 'Balance'}
-  ];
-
-  investmentRows.forEach((entry, index)=>{
-    doc.setTextColor(73,86,82);
-    doc.setFont(pdfFont,'normal');
-    doc.setFontSize(8.2);
-    doc.text(String(entry.label), investmentX[index], 418);
-    doc.setTextColor(18,32,29);
-    doc.setFont(pdfFont,'bold');
-    doc.setFontSize(19);
-    doc.text(String(entry.value), investmentX[index], 440);
-  });
-
-  const paymentLeftX = pageGridX;
-  const paymentRightX = width / 2 + 18;
-  const paymentColWidth = (pageGridW - 28) / 2;
-
-  doc.setTextColor(18,32,29);
-  doc.setFont(pdfFont,'bold');
-  doc.setFontSize(12);
-  doc.text('Payment information', paymentLeftX, 475);
-  doc.text('Cancellation & refund', paymentRightX, 475);
-
-  doc.setDrawColor(218,220,215);
-  doc.line(paymentLeftX, 482, paymentLeftX + paymentColWidth - 10, 482);
-  doc.line(paymentRightX, 482, paymentRightX + paymentColWidth - 10, 482);
-
-  const paymentBlock = textLines(paymentText, paymentColWidth - 14, 5);
-  const refundBlock = textLines(cancellationText, paymentColWidth - 14, 5);
-
-  doc.setTextColor(38,47,44);
+  doc.setFontSize(20);
+  doc.text('Your journey quotation', pageGridX, 92);
+  doc.setTextColor(87,98,93);
   doc.setFont(pdfFont,'normal');
-  doc.setFontSize(8.7);
-  paymentBlock.forEach((line: string, index: number)=>{ doc.text(line, paymentLeftX, 496 + index * 12); });
-  refundBlock.forEach((line: string, index: number)=>{ doc.text(line, paymentRightX, 496 + index * 12); });
+  doc.setFontSize(8.8);
+  doc.text('Clear traveller prices by place. Supplier costs and internal margins are never shown.', pageGridX, 111);
+
+  let quoteY=138;
+  const maxBreakdownY=388;
+  if(groupedBreakdown.length){
+    for(const [place,items] of groupedBreakdown.slice(0,5)){
+      if(quoteY>maxBreakdownY) break;
+      const placeSubtotal=items.reduce((sum,item)=>sum+item.amount,0);
+      doc.setFillColor(241,243,239);
+      doc.roundedRect(pageGridX, quoteY, pageGridW, 24, 5, 5, 'F');
+      doc.setTextColor(22,61,50);
+      doc.setFont(pdfFont,'bold');
+      doc.setFontSize(9.5);
+      doc.text(String(place).toUpperCase(), pageGridX+10, quoteY+16);
+      doc.text(formatCurrency(placeSubtotal,payload.currency), width-pageGridX-10, quoteY+16,{align:'right'});
+      quoteY+=32;
+      for(const item of items.slice(0,4)){
+        if(quoteY>maxBreakdownY) break;
+        doc.setTextColor(39,48,44);
+        doc.setFont(pdfFont,'normal');
+        doc.setFontSize(8.5);
+        const serviceLabel=item.label===item.category?item.label:`${item.label} · ${item.category}`;
+        doc.text(serviceLabel,pageGridX+10,quoteY,{maxWidth:pageGridW-120});
+        doc.setFont(pdfFont,'bold');
+        doc.text(formatCurrency(item.amount,payload.currency),width-pageGridX-10,quoteY,{align:'right'});
+        quoteY+=16;
+      }
+      quoteY+=8;
+    }
+  } else {
+    doc.setTextColor(87,98,93);doc.setFont(pdfFont,'normal');doc.setFontSize(9);
+    doc.text('Detailed place-by-place prices will appear here when costing lines are added.',pageGridX,quoteY);
+    quoteY+=28;
+  }
+
+  const investmentY=Math.max(414,Math.min(quoteY+8,438));
+  doc.setFillColor(238,242,236);
+  doc.roundedRect(pageGridX, investmentY, pageGridW, 78, 8, 8, 'F');
+  doc.setTextColor(18,32,29);doc.setFont(pdfFont,'bold');doc.setFontSize(11.5);
+  doc.text('Your journey investment',pageGridX+16,investmentY+22);
+  const invX=[pageGridX+16,pageGridX+220,pageGridX+395];
+  [{value:totalValue,label:'Total journey'},{value:reserveValue,label:'Reservation payment'},{value:balanceValue,label:'Remaining balance'}].forEach((entry,index)=>{
+    doc.setTextColor(73,86,82);doc.setFont(pdfFont,'normal');doc.setFontSize(7.5);doc.text(entry.label,invX[index],investmentY+42);
+    doc.setTextColor(18,32,29);doc.setFont(pdfFont,'bold');doc.setFontSize(15);doc.text(String(entry.value),invX[index],investmentY+62);
+  });
+
+  const infoY=investmentY+104;
+  const colW=(pageGridW-26)/2;
+  doc.setTextColor(18,32,29);doc.setFont(pdfFont,'bold');doc.setFontSize(10.5);
+  doc.text('Payment details',pageGridX,infoY);
+  doc.text('Included / not included',pageGridX+colW+26,infoY);
+  doc.setDrawColor(218,220,215);
+  doc.line(pageGridX,infoY+8,pageGridX+colW,infoY+8);
+  doc.line(pageGridX+colW+26,infoY+8,width-pageGridX,infoY+8);
+  doc.setTextColor(38,47,44);doc.setFont(pdfFont,'normal');doc.setFontSize(7.8);
+  textLines(paymentText,colW,7).forEach((line:string,index:number)=>doc.text(line,pageGridX,infoY+24+index*10));
+  const includeShort=textLines(`Included: ${includedText}`,colW,4);
+  const excludeShort=textLines(`Not included: ${excludedText}`,colW,4);
+  includeShort.forEach((line:string,index:number)=>doc.text(line,pageGridX+colW+26,infoY+24+index*10));
+  excludeShort.forEach((line:string,index:number)=>doc.text(line,pageGridX+colW+26,infoY+70+index*10));
+
+  const termsY=Math.min(infoY+120,665);
+  doc.setTextColor(18,32,29);doc.setFont(pdfFont,'bold');doc.setFontSize(9.5);doc.text('Booking note',pageGridX,termsY);
+  doc.setTextColor(66,76,71);doc.setFont(pdfFont,'normal');doc.setFontSize(7.5);
+  textLines(cancellationText,pageGridW,3).forEach((line:string,index:number)=>doc.text(line,pageGridX,termsY+15+index*10));
 
   doc.setFillColor(19,61,50);
-  doc.rect(0, 636, width, 132, 'F');
-  doc.setTextColor(247,245,239);
-  doc.setFont(pdfFont,'bold');
-  doc.setFontSize(19);
-  doc.text('YOUR JOURNEY.', width / 2, 668, {align:'center'});
-  doc.text('YOUR WELLNESS.', width / 2, 694, {align:'center'});
-  doc.text('YOUR SRI LANKA.', width / 2, 720, {align:'center'});
-
-  doc.setTextColor(247,245,239);
-  doc.setFont(pdfFont,'normal');
-  doc.setFontSize(9.2);
-  doc.text(`Thank you, ${safeName.split(' ')[0] || 'traveller'}.`, width / 2, 750, {align:'center'});
-  doc.setFont(pdfFont,'bold');
-  doc.setFontSize(8.8);
-  doc.text('CEYLON WELLNESS', pageGridX, 766);
-  doc.setFont(pdfFont,'normal');
-  doc.setFontSize(8.2);
-  doc.text('WhatsApp +48 696 741 450', pageGridX, 780);
-  doc.text('support@ceylonwellness.com', pageGridX, 792);
+  doc.rect(0, 716, width, 126, 'F');
+  doc.setTextColor(247,245,239);doc.setFont(pdfFont,'bold');doc.setFontSize(15.5);
+  doc.text('PLANNED PERSONALLY. EXPERIENCED DIFFERENTLY.',width/2,746,{align:'center'});
+  doc.setFont(pdfFont,'normal');doc.setFontSize(8.2);
+  doc.text(`Thank you, ${safeName.split(' ')[0] || 'traveller'}. We look forward to shaping your Sri Lanka journey.`,width/2,768,{align:'center'});
+  doc.setFont(pdfFont,'bold');doc.setFontSize(8.2);doc.text('CEYLON WELLNESS',pageGridX,794);
+  doc.setFont(pdfFont,'normal');doc.setFontSize(7.7);
+  doc.text('WhatsApp +48 696 741 450',pageGridX,808);
+  doc.text('support@ceylonwellness.com',width-pageGridX,808,{align:'right'});
 
   const totalPages = 4;
   for(let pageIndex = 2; pageIndex <= totalPages; pageIndex++){
@@ -934,7 +908,7 @@ function SmartGuide({lang}:{lang:Lang}){const c=copy[lang],t=optionText[lang],v=
    window.open(wa(secureMessage),'_blank','noopener,noreferrer');
   }catch(error){
    console.error('Secure journey submission failed',error);
-   alert('We could not securely send your journey request. Please refresh the security check and try again.');
+   alert('We could not send your journey request. Please check your details and try again.');
   }finally{setJourneySending(false);}
  };
  return <div className="smartGuide v4Guide v5Guide askCeylonV2 ceylonGlass"><div className="journeyStages" aria-label="Journey design stages">{[ux.discover,ux.shape,ux.journey].map((label,i)=><span key={label} className={i===stage?'active':i<stage?'done':''}>{i<stage?<CheckCircle2/>:<span className="stageDot"/>}{label}</span>)}</div><div className="guideTop"><div><div className="v2StepMeta"><span className="eyebrow">{ux.eyebrow}</span>{step<8&&<span className="microProgress">Step {step+1} of 8</span>}</div><h1>{step===0?ux.opening:step===1?'What are you naturally drawn to?':step===2?'What pace feels right?':step===3?'How much time do you have in Sri Lanka?':step===4?'Who is travelling with you?':step===5?'What level of comfort feels right?':step===6?'What budget would you like us to design around?':step===7?'Anything special we should know?':step===8?'Your journey is taking shape':'How should we contact you?'}</h1>{step===0&&<p>{ux.openingSub}</p>}{step===1&&<p>Choose everything that feels right to you. There is no limit.</p>}{step===2&&<p>Choose the rhythm you want us to build around your journey.</p>}{step===3&&<p>Dates can stay flexible. We only need enough to shape a realistic journey.</p>}{step===4&&<p>Tell us who is coming so we can plan the right stays, transfers and experiences.</p>}{step===5&&<p>Choose the comfort level you prefer. We will select the actual stays for your route and budget.</p>}{step===6&&<p>Give us a total journey budget, or let our team recommend the best value.</p>}{step===7&&<p>Optional — add one detail that would make the journey more personal, or simply continue.</p>}{step===8&&<p>Here is a simple preview of the journey we can shape around you. Our human team will refine the details before any quotation or payment.</p>}{step===9&&<p>Send your journey request securely. Our team will use these details only to prepare and contact you about your plan and quotation.</p>}</div><div className="freeBadge glassTrust"><ShieldCheck/><span>{ux.badge}</span></div></div>
@@ -1017,18 +991,21 @@ const getJourneyPricingValidationError=(lead:Partial<AdminLead>|null)=>{
   return null;
 };
 const getBookingStatus=(value:string|null|undefined)=> value==='Confirmed' ? 'Confirmed' : 'Pending';
-const downloadSavedLeadPdf=(lead:AdminLead)=>downloadTravellerPdf({name:lead.name,journeyRef:lead.journey_ref,travelDates:lead.travel_dates,travellers:lead.travellers,preferredLanguage:lead.preferred_language,preparedBy:'Ceylon Wellness',finalNote:lead.requirements||'Journey details are subject to human confirmation.',itinerary:(lead.itinerary||[]).map(day=>({day:day.day,place:day.place,focus:day.focus,activity:day.activity,stay:day.stay,notes:day.notes})),arrivalAirport:lead.arrival_airport,flightNumber:lead.flight_number,landingTime:lead.landing_time,airportPickup:lead.airport_pickup,journeyStyle:lead.journey_style,accommodation:lead.accommodation,transport:lead.transport,budgetRange:lead.budget_range,requirements:lead.requirements,currency:lead.currency,totalPrice:lead.total_price,advanceDepositType:lead.advance_deposit_type,advanceDepositValue:lead.advance_deposit_value,advanceAmount:lead.advance_amount,remainingBalance:lead.remaining_balance,advanceDueDate:lead.advance_due_date,balanceDueDate:lead.balance_due_date,quotationValidUntil:lead.quotation_valid_until,bookingStatus:lead.booking_status,accommodationStatus:lead.accommodation_booking_status,transportStatus:lead.transport_booking_status,wellnessStatus:lead.wellness_booking_status,accommodationDetails:lead.accommodation_booking_details,transportDetails:lead.transport_booking_details,wellnessDetails:lead.wellness_booking_details,priceIncludes:lead.price_includes,priceExcludes:lead.price_excludes,paymentInstructions:lead.traveller_payment_instructions,cancellationTerms:lead.traveller_cancellation_terms});
+const downloadSavedLeadPdf=(lead:AdminLead)=>{const meta=readQuoteMeta(lead.itinerary as any);const lines=readCostLines(lead.itinerary as any);return downloadTravellerPdf({name:lead.name,journeyRef:lead.journey_ref,travelDates:lead.travel_dates,travellers:lead.travellers,preferredLanguage:lead.preferred_language,preparedBy:'Ceylon Wellness',finalNote:lead.requirements||'Journey details are subject to human confirmation.',itinerary:(lead.itinerary||[]).map(day=>({day:day.day,place:day.place,focus:day.focus,activity:day.activity,stay:day.stay,notes:day.notes})),arrivalAirport:lead.arrival_airport,flightNumber:lead.flight_number,landingTime:lead.landing_time,airportPickup:lead.airport_pickup,journeyStyle:lead.journey_style,accommodation:lead.accommodation,transport:lead.transport,budgetRange:lead.budget_range,requirements:lead.requirements,currency:lead.currency,totalPrice:lead.total_price,advanceDepositType:lead.advance_deposit_type,advanceDepositValue:lead.advance_deposit_value,advanceAmount:lead.advance_amount,remainingBalance:lead.remaining_balance,advanceDueDate:lead.advance_due_date,balanceDueDate:lead.balance_due_date,quotationValidUntil:lead.quotation_valid_until,bookingStatus:lead.booking_status,accommodationStatus:lead.accommodation_booking_status,transportStatus:lead.transport_booking_status,wellnessStatus:lead.wellness_booking_status,accommodationDetails:lead.accommodation_booking_details,transportDetails:lead.transport_booking_details,wellnessDetails:lead.wellness_booking_details,priceIncludes:lead.price_includes,priceExcludes:lead.price_excludes,paymentInstructions:lead.traveller_payment_instructions,cancellationTerms:lead.traveller_cancellation_terms,priceBreakdown:lines.map(x=>({place:x.place,label:x.label,category:x.category,qty:x.qty,unit:x.unit,supplierLkr:(Number(x.qty)||0)*(Number(x.rate)||0)})),markupPercent:meta.markupPercent,fxRateLkrPerQuoteCurrency:meta.fxRateLkrPerQuoteCurrency});};
 const escapeHtml=(value:string)=>value.replace(/[&<>"']/g,(char)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;' }[char] as string));
 
 type CostUnit='per night'|'per room/night'|'per person'|'per session'|'per day'|'per km'|'fixed';
-type CostLine={id:string;category:'Hotel'|'Transport'|'Travel Activity'|'Wellness'|'Other';label:string;unit:CostUnit;qty:number;rate:number};
+type CostLine={id:string;category:'Hotel'|'Transport'|'Travel Activity'|'Wellness'|'Other';place:string;label:string;unit:CostUnit;qty:number;rate:number};
 const COST_UNITS:CostUnit[]=['per night','per room/night','per person','per session','per day','per km','fixed'];
-const readCostLines=(itinerary:any[]|null|undefined):CostLine[]=>{const raw=itinerary?.[0]?.cost_lines;return Array.isArray(raw)?raw.map((x:any)=>({id:String(x.id||crypto.randomUUID()),category:(['Hotel','Transport','Travel Activity','Wellness','Other'].includes(x.category)?x.category:'Other') as CostLine['category'],label:String(x.label||''),unit:(COST_UNITS.includes(x.unit)?x.unit:'fixed') as CostUnit,qty:Number(x.qty)||1,rate:Number(x.rate)||0})):[];};
-const embedCostLines=(itinerary:DayPlan[]|null|undefined,lines:CostLine[])=>{const base=(itinerary||[]).map(d=>({...d} as any));if(!base.length)base.push({day:1,place:'',focus:'',activity:'',stay:'',notes:''});base[0]={...base[0],cost_lines:lines};return base as DayPlan[];};
+type QuoteMeta={fxRateLkrPerQuoteCurrency:number;markupPercent:number;finalTravellerPrice:number;paymentMethod:string;accountHolder:string;bankName:string;accountNumber:string;swiftBic:string;bankAddress:string;paymentReference:string};
+const EMPTY_QUOTE_META:QuoteMeta={fxRateLkrPerQuoteCurrency:1,markupPercent:20,finalTravellerPrice:0,paymentMethod:'Bank Transfer',accountHolder:'',bankName:'',accountNumber:'',swiftBic:'',bankAddress:'',paymentReference:''};
+const readCostLines=(itinerary:any[]|null|undefined):CostLine[]=>{const raw=itinerary?.[0]?.cost_lines;return Array.isArray(raw)?raw.map((x:any)=>({id:String(x.id||crypto.randomUUID()),category:(['Hotel','Transport','Travel Activity','Wellness','Other'].includes(x.category)?x.category:'Other') as CostLine['category'],place:String(x.place||''),label:String(x.label||''),unit:(COST_UNITS.includes(x.unit)?x.unit:'fixed') as CostUnit,qty:Number(x.qty)||1,rate:Number(x.rate)||0})):[];};
+const readQuoteMeta=(itinerary:any[]|null|undefined):QuoteMeta=>({...EMPTY_QUOTE_META,...(itinerary?.[0]?.quote_meta||{})});
+const embedCostLines=(itinerary:DayPlan[]|null|undefined,lines:CostLine[],quoteMeta?:QuoteMeta)=>{const base=(itinerary||[]).map(d=>({...d} as any));if(!base.length)base.push({day:1,place:'',focus:'',activity:'',stay:'',notes:''});base[0]={...base[0],cost_lines:lines,...(quoteMeta?{quote_meta:quoteMeta}:{})};return base as DayPlan[];};
 const numericBudget=(value:string|null|undefined)=>{if(!value)return null;const m=value.replace(/\s/g,'').match(/(?:EUR|USD|PLN|GBP|LKR|CHF|AUD|CAD)?[^0-9]*([0-9]+(?:[.,][0-9]+)?)/i);if(!m)return null;const n=Number(m[1].replace(',','.'));return Number.isFinite(n)?n:null;};
 
 function AdminWorkspace(){
- const [email,setEmail]=useState('');const [password,setPassword]=useState('');const [session,setSession]=useState<any>(null);const [tab,setTab]=useState<'travel'|'reiki'>('travel');const [leads,setLeads]=useState<AdminLead[]>([]);const [reiki,setReiki]=useState<ReikiRequest[]>([]);const [selected,setSelected]=useState<AdminLead|null>(null);const [selectedReiki,setSelectedReiki]=useState<ReikiRequest|null>(null);const [query,setQuery]=useState('');const [notice,setNotice]=useState('');const [loading,setLoading]=useState(false);const [editing,setEditing]=useState(false);const [draft,setDraft]=useState<AdminLead|null>(null);const [reikiDraft,setReikiDraft]=useState<ReikiRequest|null>(null);const [showTrash,setShowTrash]=useState(false);const [role,setRole]=useState('');const [trashSelection,setTrashSelection]=useState<string[]>([]);const [showInternalAdvanced,setShowInternalAdvanced]=useState(false);const [journeyFinalised,setJourneyFinalised]=useState(false);const [workspaceTab,setWorkspaceTab]=useState<'overview'|'journey'|'price'|'booking'|'terms'|'internal'>('overview');const [expandedDay,setExpandedDay]=useState<number|null>(null);const [agentPaste,setAgentPaste]=useState('');const [deleteModal,setDeleteModal]=useState<{mode:'soft'|'hard';kind:'travel'|'reiki';id:string;name:string;reference:string;selectedIds?:string[];reason:string;customReason:string}|null>(null);const [costLines,setCostLines]=useState<CostLine[]>([]);const DELETE_REASON_OPTIONS=['Duplicate / Test record','Created by mistake','Invalid / Spam request','Traveller requested deletion','Data retention / privacy','No longer required','Other'];
+ const [email,setEmail]=useState('');const [password,setPassword]=useState('');const [session,setSession]=useState<any>(null);const [tab,setTab]=useState<'travel'|'reiki'>('travel');const [leads,setLeads]=useState<AdminLead[]>([]);const [reiki,setReiki]=useState<ReikiRequest[]>([]);const [selected,setSelected]=useState<AdminLead|null>(null);const [selectedReiki,setSelectedReiki]=useState<ReikiRequest|null>(null);const [query,setQuery]=useState('');const [notice,setNotice]=useState('');const [loading,setLoading]=useState(false);const [editing,setEditing]=useState(false);const [draft,setDraft]=useState<AdminLead|null>(null);const [reikiDraft,setReikiDraft]=useState<ReikiRequest|null>(null);const [showTrash,setShowTrash]=useState(false);const [role,setRole]=useState('');const [trashSelection,setTrashSelection]=useState<string[]>([]);const [showInternalAdvanced,setShowInternalAdvanced]=useState(false);const [journeyFinalised,setJourneyFinalised]=useState(false);const [workspaceTab,setWorkspaceTab]=useState<'overview'|'journey'|'price'|'booking'|'terms'|'internal'>('overview');const [expandedDay,setExpandedDay]=useState<number|null>(null);const [agentPaste,setAgentPaste]=useState('');const [deleteModal,setDeleteModal]=useState<{mode:'soft'|'hard';kind:'travel'|'reiki';id:string;name:string;reference:string;selectedIds?:string[];reason:string;customReason:string}|null>(null);const [costLines,setCostLines]=useState<CostLine[]>([]);const [quoteMeta,setQuoteMeta]=useState<QuoteMeta>(EMPTY_QUOTE_META);const DELETE_REASON_OPTIONS=['Duplicate / Test record','Created by mistake','Invalid / Spam request','Traveller requested deletion','Data retention / privacy','No longer required','Other'];
  const audit=async(action:string,entity_type:string,entity_id:string,metadata:any={})=>{if(!supabase)return;await supabase.from('audit_logs').insert({actor_id:session?.user?.id||null,actor_type:'user',action,entity_type,entity_id,metadata});};
  const load=async()=>{if(!supabase)return;setLoading(true);const [a,b,c]=await Promise.all([supabase.from('leads').select('*').order('created_at',{ascending:false}),supabase.from('reiki_requests').select('*').order('created_at',{ascending:false}),supabase.from('user_roles').select('role').eq('user_id',session?.user?.id||'')]);setLoading(false);if(a.error||b.error){setNotice('Admin data could not be loaded. Check the V9 migration and permissions.');return;}setLeads((a.data||[]) as AdminLead[]);setReiki((b.data||[]) as ReikiRequest[]);setRole(c.data?.some((x:any)=>x.role==='SUPER_ADMIN')?'SUPER_ADMIN':(c.data?.[0]?.role||''));setNotice('');};
  useEffect(()=>{if(!supabase)return;supabase.auth.getSession().then(({data})=>setSession(data.session));const {data}=supabase.auth.onAuthStateChange((_e,s)=>setSession(s));return()=>data.subscription.unsubscribe();},[]);
@@ -1036,7 +1013,7 @@ function AdminWorkspace(){
  if(!supabaseConfigured)return <main className="page adminPage"><span className="eyebrow">V9 · CEYLON WELLNESS OS</span><h1>Admin setup required</h1><p className="lead">Secure shared editing is disabled until Supabase is configured.</p></main>;
  const login=async(e:React.FormEvent)=>{e.preventDefault();if(!supabase)return;setLoading(true);const {error}=await supabase.auth.signInWithPassword({email,password});setLoading(false);if(error)setNotice('Login failed. Check your email/password or admin setup.');};
  if(!session)return <main className="page adminPage"><div className="adminLogin"><LockKeyhole/><span className="eyebrow">CEYLON WELLNESS · PRIVATE</span><h1>Planner sign in</h1><p>For authorised Ceylon Wellness planners only.</p><form onSubmit={login}><label>Email<input type="email" value={email} onChange={e=>setEmail(e.target.value)} required/></label><label>Password<input type="password" value={password} onChange={e=>setPassword(e.target.value)} required/></label><button className="button" disabled={loading}><LogIn/> {loading?'Signing in…':'Sign in'}</button></form>{notice&&<p className="adminNotice">{notice}</p>}</div></main>;
-  const saveLead=async():Promise<AdminLead|null>=>{if(!supabase||!draft)return null;const advance=getAdvanceSummary(draft);const payload={itinerary:embedCostLines(draft.itinerary,costLines),name:draft.name,email:draft.email,whatsapp:draft.whatsapp,travel_dates:draft.travel_dates,duration:draft.duration,travellers:draft.travellers,wellness_interests:draft.wellness_interests,journey_style:draft.journey_style,accommodation:draft.accommodation,transport:draft.transport,budget_range:draft.budget_range,requirements:draft.requirements,status:draft.status,preferred_language:draft.preferred_language,delivery_preference:draft.delivery_preference,arrival_airport:draft.arrival_airport,flight_number:draft.flight_number,landing_time:draft.landing_time,airport_pickup:draft.airport_pickup,currency:draft.currency?.trim()||null,total_price:typeof draft.total_price==='number'?draft.total_price:(draft.total_price!==null&&draft.total_price!==undefined?Number(draft.total_price):null),advance_deposit_type:draft.advance_deposit_type||'percentage',advance_deposit_value:typeof draft.advance_deposit_value==='number'?draft.advance_deposit_value:(draft.advance_deposit_value!==null&&draft.advance_deposit_value!==undefined?Number(draft.advance_deposit_value):null),advance_amount:advance.advanceAmount || null,remaining_balance:advance.remainingBalance || null,advance_due_date:draft.advance_due_date,balance_due_date:draft.balance_due_date,quotation_valid_until:draft.quotation_valid_until,booking_status:draft.booking_status,accommodation_booking_status:draft.accommodation_booking_status||'Pending',transport_booking_status:draft.transport_booking_status||'Pending',wellness_booking_status:draft.wellness_booking_status||'Pending',accommodation_booking_details:draft.accommodation_booking_details,transport_booking_details:draft.transport_booking_details,wellness_booking_details:draft.wellness_booking_details,price_includes:draft.price_includes,price_excludes:draft.price_excludes,traveller_payment_instructions:draft.traveller_payment_instructions,traveller_cancellation_terms:draft.traveller_cancellation_terms,supplier_cost:typeof draft.supplier_cost==='number'?draft.supplier_cost:(draft.supplier_cost!==null&&draft.supplier_cost!==undefined?Number(draft.supplier_cost):null),supplier_reference:draft.supplier_reference,internal_margin:typeof draft.internal_margin==='number'?draft.internal_margin:(draft.internal_margin!==null&&draft.internal_margin!==undefined?Number(draft.internal_margin):null),internal_commercial_notes:draft.internal_commercial_notes,admin_notes:draft.admin_notes,updated_at:new Date().toISOString()};try{const {data,error}=await supabase.from('leads').update(payload).eq('id',draft.id).select('*').single();if(error||!data){setNotice('Could not save journey.');return null;}try{await audit('UPDATE','lead',draft.id,{journey_ref:draft.journey_ref});}catch(auditError){console.error('Journey audit failed',auditError);}const savedLead=data as AdminLead;setSelected(savedLead);setDraft(savedLead);setEditing(false);setNotice('Journey saved.');await load();return savedLead;}catch(error){console.error('Journey save failed',error);setNotice('Could not save journey.');return null;}};
+  const saveLead=async():Promise<AdminLead|null>=>{if(!supabase||!draft)return null;const advance=getAdvanceSummary(draft);const payload={itinerary:embedCostLines(draft.itinerary,costLines,quoteMeta),name:draft.name,email:draft.email,whatsapp:draft.whatsapp,travel_dates:draft.travel_dates,duration:draft.duration,travellers:draft.travellers,wellness_interests:draft.wellness_interests,journey_style:draft.journey_style,accommodation:draft.accommodation,transport:draft.transport,budget_range:draft.budget_range,requirements:draft.requirements,status:draft.status,preferred_language:draft.preferred_language,delivery_preference:draft.delivery_preference,arrival_airport:draft.arrival_airport,flight_number:draft.flight_number,landing_time:draft.landing_time,airport_pickup:draft.airport_pickup,currency:draft.currency?.trim()||null,total_price:typeof draft.total_price==='number'?draft.total_price:(draft.total_price!==null&&draft.total_price!==undefined?Number(draft.total_price):null),advance_deposit_type:draft.advance_deposit_type||'percentage',advance_deposit_value:typeof draft.advance_deposit_value==='number'?draft.advance_deposit_value:(draft.advance_deposit_value!==null&&draft.advance_deposit_value!==undefined?Number(draft.advance_deposit_value):null),advance_amount:advance.advanceAmount || null,remaining_balance:advance.remainingBalance || null,advance_due_date:draft.advance_due_date,balance_due_date:draft.balance_due_date,quotation_valid_until:draft.quotation_valid_until,booking_status:draft.booking_status,accommodation_booking_status:draft.accommodation_booking_status||'Pending',transport_booking_status:draft.transport_booking_status||'Pending',wellness_booking_status:draft.wellness_booking_status||'Pending',accommodation_booking_details:draft.accommodation_booking_details,transport_booking_details:draft.transport_booking_details,wellness_booking_details:draft.wellness_booking_details,price_includes:draft.price_includes,price_excludes:draft.price_excludes,traveller_payment_instructions:draft.traveller_payment_instructions,traveller_cancellation_terms:draft.traveller_cancellation_terms,supplier_cost:typeof draft.supplier_cost==='number'?draft.supplier_cost:(draft.supplier_cost!==null&&draft.supplier_cost!==undefined?Number(draft.supplier_cost):null),supplier_reference:draft.supplier_reference,internal_margin:typeof draft.internal_margin==='number'?draft.internal_margin:(draft.internal_margin!==null&&draft.internal_margin!==undefined?Number(draft.internal_margin):null),internal_commercial_notes:draft.internal_commercial_notes,admin_notes:draft.admin_notes,updated_at:new Date().toISOString()};try{const {data,error}=await supabase.from('leads').update(payload).eq('id',draft.id).select('*').single();if(error||!data){setNotice('Could not save journey.');return null;}try{await audit('UPDATE','lead',draft.id,{journey_ref:draft.journey_ref});}catch(auditError){console.error('Journey audit failed',auditError);}const savedLead=data as AdminLead;setSelected(savedLead);setDraft(savedLead);setEditing(false);setNotice('Journey saved.');await load();return savedLead;}catch(error){console.error('Journey save failed',error);setNotice('Could not save journey.');return null;}};
   const saveAndDownloadPdf=async()=>{
     if(!draft)return;
     setNotice('Saving journey and preparing PDF…');
@@ -1073,21 +1050,27 @@ const saveReiki=async()=>{if(!supabase||!reikiDraft)return;const payload={name:r
  const removeDay=(i:number)=>{if(!draft)return;const list=(draft.itinerary||[]).filter((_d,n)=>n!==i).map((d,n)=>({...d,day:n+1}));setDraft({...draft,itinerary:list});};
  const travelFiltered=leads.filter(x=>Boolean(x.deleted_at)===showTrash&&(`${x.name} ${x.email} ${x.whatsapp} ${x.journey_ref}`).toLowerCase().includes(query.toLowerCase()));
  const reikiFiltered=reiki.filter(x=>Boolean(x.deleted_at)===showTrash&&(`${x.name} ${x.email} ${x.whatsapp} ${x.request_ref} ${x.reiki_level}`).toLowerCase().includes(query.toLowerCase()));
- const openTravel=(x:AdminLead)=>{setAgentPaste('');setSelected(x);setSelectedReiki(null);setCostLines(readCostLines(x.itinerary as any));setDraft({...x,itinerary:(x.itinerary||[]).map(d=>({...d}))});setWorkspaceTab('overview');setEditing(false);};
+ const openTravel=(x:AdminLead)=>{setAgentPaste('');setSelected(x);setSelectedReiki(null);setCostLines(readCostLines(x.itinerary as any));setQuoteMeta(readQuoteMeta(x.itinerary as any));setDraft({...x,itinerary:(x.itinerary||[]).map(d=>({...d}))});setWorkspaceTab('overview');setEditing(false);};
  const openReiki=(x:ReikiRequest)=>{setSelectedReiki(x);setSelected(null);setReikiDraft({...x});setEditing(false);};
  const emailLink=(to:string|null,subject:string,body:string)=>`mailto:${to||''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
  const generateTravellerPdf=(lead:AdminLead)=>{if(typeof window==='undefined')return;const invoiceSummary=getAdvanceSummary(lead);const itinerary=(lead.itinerary||[]).map(day=>`<div class="day"><h4>Day ${day.day}</h4><p><strong>Location:</strong> ${day.place||'TBC'}</p><p><strong>Focus:</strong> ${day.focus||'TBC'}</p><p><strong>Plan:</strong> ${day.activity||'TBC'}</p><p><strong>Stay:</strong> ${day.stay||'TBC'}</p><p><strong>Notes:</strong> ${day.notes||'—'}</p></div>`).join('')||'<p>No day-by-day itinerary has been added yet.</p>';
  const html=`<!doctype html><html><head><meta charset="UTF-8"/><title>${lead.name||'Ceylon Wellness Journey'} · Final Journey</title><style>body{font-family:Arial,sans-serif;background:#f3efe7;color:#18261f;margin:0;padding:28px}.sheet{max-width:900px;margin:0 auto;background:#fff;padding:32px;border:1px solid #d8dfd7;border-radius:18px}.brand{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;padding-bottom:18px;border-bottom:1px solid #e7ebea}.brand h1{margin:0;font-size:30px;color:#163a2b}.meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 18px;margin:24px 0}.meta div{border:1px solid #e7ebea;padding:12px;border-radius:10px}.section{margin-top:24px;padding-top:18px;border-top:1px solid #e7ebea}.section h2{font-size:20px;color:#163a2b;margin:0 0 12px}.day{border:1px solid #ebf0ed;padding:12px;border-radius:10px;margin-top:12px}.day h4{margin:0 0 6px;font-size:16px}.summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 18px}.summary div{padding:12px;border-radius:10px;background:#f8f7f3;border:1px solid #e7ebea}.small{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#68766c}.strong{font-weight:700}.foot{margin-top:30px;font-size:12px;color:#667068;line-height:1.6} @media print{body{padding:0;background:#fff}.sheet{border:none;border-radius:0;max-width:none;padding:24px}} </style></head><body><div class="sheet"><div class="brand"><div><div class="small">Ceylon Wellness</div><h1>Final Journey Proposal / Quotation</h1></div><div class="small">${lead.journey_ref||'Journey proposal'}<br/>${lead.booking_status||'Draft'}</div></div><div class="meta"><div><div class="small">Traveller</div><div class="strong">${lead.name||'Traveller'}</div></div><div><div class="small">Preferred language</div><div class="strong">${lead.preferred_language||'—'}</div></div><div><div class="small">Travel dates</div><div class="strong">${lead.travel_dates||'TBC'}</div></div><div><div class="small">Travellers</div><div class="strong">${lead.travellers||1}</div></div><div><div class="small">Arrival airport</div><div class="strong">${lead.arrival_airport||'TBC'}</div></div><div><div class="small">Flight</div><div class="strong">${lead.flight_number||'TBC'}</div></div><div><div class="small">Airport pickup</div><div class="strong">${lead.airport_pickup||'TBC'}</div></div><div><div class="small">Journey style</div><div class="strong">${lead.journey_style||'TBC'}</div></div></div><div class="section"><h2>Pricing & payment</h2><div class="summary"><div><div class="small">Total price</div><div class="strong">${lead.currency||'USD'} ${Number(lead.total_price ?? 0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div><div><div class="small">Advance deposit</div><div class="strong">${lead.advance_deposit_type==='fixed_amount' ? (lead.advance_deposit_value || 0) : (lead.advance_deposit_value || 0) + '%'}</div></div><div><div class="small">Advance amount</div><div class="strong">${lead.currency||'USD'} ${invoiceSummary.advanceAmount.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div><div><div class="small">Remaining balance</div><div class="strong">${lead.currency||'USD'} ${invoiceSummary.remainingBalance.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div><div><div class="small">Advance due date</div><div class="strong">${lead.advance_due_date||'TBC'}</div></div><div><div class="small">Balance due date</div><div class="strong">${lead.balance_due_date||'TBC'}</div></div><div><div class="small">Quotation valid until</div><div class="strong">${lead.quotation_valid_until||'TBC'}</div></div><div><div class="small">Booking status</div><div class="strong">${lead.booking_status||'Draft'}</div></div></div></div><div class="section"><h2>Journey details</h2><div class="summary"><div><div class="small">Accommodation</div><div class="strong">${lead.accommodation||'TBC'}</div></div><div><div class="small">Transport</div><div class="strong">${lead.transport||'TBC'}</div></div><div><div class="small">Wellness / activity</div><div class="strong">${lead.wellness_booking_details||'TBC'}</div></div><div><div class="small">Price includes</div><div class="strong">${lead.price_includes||'TBC'}</div></div><div><div class="small">Price excludes</div><div class="strong">${lead.price_excludes||'TBC'}</div></div><div><div class="small">Payment instructions</div><div class="strong">${lead.traveller_payment_instructions||'TBC'}</div></div><div style="grid-column:1 / -1"><div class="small">Cancellation / refund terms</div><div class="strong">${lead.traveller_cancellation_terms||'TBC'}</div></div></div></div><div class="section"><h2>Itinerary</h2>${itinerary}</div><div class="foot"><p>Ceylon Wellness · Wellness travel and spiritual experiences in Sri Lanka</p><p>For the full journey there may be a final human review of availability, supplier terms and approved plans before any payment or booking confirmation is made.</p><p>Contact: +48 696 741 450 · hello@ceylonwellness.com</p></div></div></body></html>`; const win=window.open('', '_blank'); if(!win){setNotice('Preview was blocked by the browser. Allow pop-ups for localhost and try again.');return;} win.document.write(html); win.document.close(); setTimeout(()=>{win.focus(); win.print();},300);};
-const addCostLine=(category:CostLine['category'],unit:CostUnit,label='')=>setCostLines(lines=>[...lines,{id:crypto.randomUUID(),category,label,unit,qty:1,rate:0}]);
+const addCostLine=(category:CostLine['category'],unit:CostUnit,label='')=>setCostLines(lines=>[...lines,{id:crypto.randomUUID(),category,place:'',label,unit,qty:1,rate:0}]);
  const updateCostLine=(id:string,patch:Partial<CostLine>)=>setCostLines(lines=>lines.map(x=>x.id===id?{...x,...patch}:x));
  const removeCostLine=(id:string)=>setCostLines(lines=>lines.filter(x=>x.id!==id));
  const supplierTotal=costLines.reduce((sum,x)=>sum+(Number(x.qty)||0)*(Number(x.rate)||0),0);
- const marginValue=Number(draft?.internal_margin||0);
+ const markupPercent=Math.max(0,Number(quoteMeta.markupPercent||0));
+ const marginValue=supplierTotal*(markupPercent/100);
  const sellingTotal=supplierTotal+marginValue;
  const travellerBudget=numericBudget(draft?.budget_range);
  const travellerBudgetIsLkr=/\bLKR\b|\bRs\.?\b|රු/i.test(draft?.budget_range||'');
  const budgetDifference=travellerBudget===null||!travellerBudgetIsLkr?null:travellerBudget-sellingTotal;
- const applyCosting=()=>{if(!draft)return;setDraft({...draft,currency:'LKR',supplier_cost:Number(supplierTotal.toFixed(2)),total_price:Number(sellingTotal.toFixed(2))});setNotice('LKR costing applied to the quotation.');};
+ const quoteCurrency=(draft?.currency||'EUR').trim().toUpperCase();
+ const fxRate=quoteCurrency==='LKR'?1:Number(quoteMeta.fxRateLkrPerQuoteCurrency||0);
+ const convertedSellingTotal=fxRate>0?sellingTotal/fxRate:0;
+ const finalTravellerPrice=Number(quoteMeta.finalTravellerPrice||0)>0?Number(quoteMeta.finalTravellerPrice):convertedSellingTotal;
+ const applyCosting=()=>{if(!draft)return;if(quoteCurrency!=='LKR'&&fxRate<=0){setNotice(`Enter the exchange rate: 1 ${quoteCurrency} = how many LKR.`);return;}if(finalTravellerPrice<=0){setNotice('Add supplier costs first, then check the final traveller price.');return;}setDraft({...draft,currency:quoteCurrency,supplier_cost:Number(supplierTotal.toFixed(2)),internal_margin:Number(marginValue.toFixed(2)),total_price:Number(finalTravellerPrice.toFixed(2))});setQuoteMeta({...quoteMeta,finalTravellerPrice:Number(finalTravellerPrice.toFixed(2))});setNotice(`Final traveller price saved in ${quoteCurrency}. Supplier costs and margin remain private.`);};
+ const applyPaymentDetails=()=>{if(!draft)return;const lines=[quoteMeta.paymentMethod&&`Payment method: ${quoteMeta.paymentMethod}`,quoteMeta.accountHolder&&`Account holder: ${quoteMeta.accountHolder}`,quoteMeta.bankName&&`Bank: ${quoteMeta.bankName}`,quoteMeta.accountNumber&&`IBAN / Account number: ${quoteMeta.accountNumber}`,quoteMeta.swiftBic&&`SWIFT / BIC: ${quoteMeta.swiftBic}`,quoteMeta.bankAddress&&`Bank address: ${quoteMeta.bankAddress}`,`Payment reference: ${quoteMeta.paymentReference||draft.journey_ref||'Journey reference'}`].filter(Boolean);setDraft({...draft,traveller_payment_instructions:lines.join('\n')});setNotice('Bank / payment details added to traveller payment instructions.');};
  const setDepositPreset=(value:number)=>draft&&setDraft({...draft,advance_deposit_type:'percentage',advance_deposit_value:value});
  const requestComplete=Boolean(draft?.name&&draft?.travel_dates&&draft?.travellers);
  const journeyComplete=Boolean((draft?.itinerary||[]).length);
@@ -1129,6 +1112,15 @@ return (
             {[['overview','Request',requestComplete],['journey','Journey',journeyComplete],['price','Price',priceComplete],['booking','Bookings',bookingComplete],['terms','Review',journeyFinalised]].map(([key,label,done],idx)=><Fragment key={String(key)}><button type="button" className={workspaceTab===key?'active':done?'done':''} onClick={()=>setWorkspaceTab(key as any)}><span className="v10StepDot">{done?'✓':idx+1}</span><span>{label}</span></button>{idx<4&&<i className="v10StepLine"/>}</Fragment>)}
             <button type="button" className={`v10MoreBtn ${workspaceTab==='internal'?'active':''}`} onClick={()=>setWorkspaceTab('internal')}>••• <span>Admin</span></button>
           </nav>
+          <div className="v102PersistentActions v102PersistentActions--top" role="region" aria-label="Journey actions">
+            <div className="v102ActionMeta"><span className="eyebrow">JOURNEY ACTIONS</span><b>{draft.journey_ref||'New journey'}</b><small>Save · preview · send — always easy to find</small></div>
+            <div className="v102ActionButtons">
+              <button type="button" className="outlineBtn" onClick={saveLead}><CheckCircle2/> Save Draft</button>
+              <button type="button" className="outlineBtn" onClick={()=>generateTravellerPdf(draft)}><FileText/> Preview PDF</button>
+              <button type="button" className="button v102DownloadBtn" onClick={saveAndDownloadPdf}><Download/> Download Final PDF</button>
+            </div>
+            <div className="v102SecondaryActions"><a href={wa(travelMsg)} target="_blank" rel="noreferrer"><MessageCircle/> WhatsApp</a><a href={emailLink(selected.email,`Ceylon Wellness · ${selected.journey_ref||'Journey'}`,travelMsg)}><Mail/> Email</a></div>
+          </div>
           <div className={`adminEditGrid v10Workspace v10-${workspaceTab}`}>
             <div className="editorSection editorSection--quickIntake">
               <div className="editorSectionHeader"><div><span className="eyebrow">FAST START</span><h3>Paste agent request</h3><p>Paste the travel agent’s WhatsApp or email. Traveller facts are extracted so you only check what matters — nothing is invented.</p></div></div>
@@ -1202,29 +1194,19 @@ return (
             </div>
 
             <div className="editorSection editorSection--pricing">
-              <div className="editorSectionHeader v10PriceHeader"><div><span className="eyebrow">LIVE COST ENGINE · LKR</span><h3>Build the journey cost in Sri Lankan Rupees</h3><p>Enter real local supplier rates in LKR. Hotel, transport, travel activities and wellness are calculated automatically — no calculator needed.</p></div><div className="v10BudgetBadge"><span>Traveller budget</span><b>{travellerBudget===null?'Not set':draft.budget_range||'Not set'}</b><small>{travellerBudget!==null&&!travellerBudgetIsLkr?'Different currency · compare after quotation conversion':'Live budget check'}</small></div></div>
-              <div className="v102AddBar"><div><span className="eyebrow">ADD COST</span><b>What do you want to price?</b></div><div className="costQuickAdd"><button type="button" onClick={()=>addCostLine('Hotel','per room/night','Hotel')}><Plus/> Hotel stay</button><button type="button" onClick={()=>addCostLine('Transport','per day','Vehicle + driver')}><Plus/> Transport / day</button><button type="button" onClick={()=>addCostLine('Transport','per km','Transport')}><Plus/> Transport / km</button><button type="button" onClick={()=>addCostLine('Travel Activity','per person','Travel activity')}><Plus/> Travel activity</button><button type="button" onClick={()=>addCostLine('Wellness','per person','Wellness activity')}><Plus/> Wellness</button></div></div>
-              <div className="costTable">
-                <div className="costTableHead"><span>Type</span><span>Service</span><span>Pricing</span><span>Qty</span><span>Rate · LKR</span><span>Total · LKR</span><span></span></div>
-                {costLines.length===0&&<div className="costEmpty"><Sparkles/><div><b>No costing lines yet</b><span>Use the buttons above. Rates stay blank until you enter a real supplier price.</span></div></div>}
-                {costLines.map(line=><div className="costRow" key={line.id}>
-                  <select value={line.category} onChange={e=>updateCostLine(line.id,{category:e.target.value as CostLine['category']})}><option>Hotel</option><option>Transport</option><option>Travel Activity</option><option>Wellness</option><option>Other</option></select>
-                  <input value={line.label} onChange={e=>updateCostLine(line.id,{label:e.target.value})} placeholder="Supplier / service"/>
-                  <select value={line.unit} onChange={e=>updateCostLine(line.id,{unit:e.target.value as CostUnit})}>{COST_UNITS.map(u=><option key={u}>{u}</option>)}</select>
-                  <input type="number" min="0" step="0.01" value={line.qty} onChange={e=>updateCostLine(line.id,{qty:Number(e.target.value)})}/>
-                  <input type="number" min="0" step="0.01" value={line.rate||''} onChange={e=>updateCostLine(line.id,{rate:Number(e.target.value)})} placeholder="0.00"/>
-                  <strong>{formatMoney((Number(line.qty)||0)*(Number(line.rate)||0),'LKR')}</strong>
-                  <button type="button" className="costRemove" onClick={()=>removeCostLine(line.id)} aria-label="Remove cost line"><Trash2/></button>
-                </div>)}
-              </div>
-              <div className="v10QuoteDashboard">
-                <div><span>Supplier cost</span><strong>{formatMoney(supplierTotal,'LKR')}</strong></div>
-                <label><span>Margin / service fee</span><input type="number" min="0" step="0.01" value={draft.internal_margin??''} onChange={e=>setDraft({...draft,internal_margin:e.target.value===''?null:Number(e.target.value)})} placeholder="0.00"/></label>
-                <div className="primary"><span>Selling price</span><strong>{formatMoney(sellingTotal,'LKR')}</strong></div>
-                <div className={budgetDifference===null?'neutral':budgetDifference>=0?'good':'warn'}><span>Budget position</span><strong>{travellerBudget===null?'Add traveller budget':!travellerBudgetIsLkr?'Conversion needed':budgetDifference!==null&&budgetDifference>=0?`${formatMoney(budgetDifference,'LKR')} remaining`:budgetDifference!==null?`${formatMoney(Math.abs(budgetDifference),'LKR')} over budget`:'Conversion needed'}</strong></div>
-              </div>
-              <div className="costApplyRow v102ApplyRow"><div className="v102CurrencyLock"><span>Costing currency</span><b>LKR · Sri Lankan Rupees</b><small>Local supplier costing stays consistent.</small></div><button type="button" className="button" onClick={applyCosting}><CheckCircle2/> Apply LKR total to quotation</button></div>
-              <div className="depositPanel"><div><span className="eyebrow">PAYMENT</span><h4>Reservation & balance</h4><small>Calculated from the applied quotation total.</small></div><div className="depositPresets"><button type="button" onClick={()=>setDepositPreset(20)}>20%</button><button type="button" onClick={()=>setDepositPreset(30)}>30%</button><button type="button" onClick={()=>setDepositPreset(50)}>50%</button></div><label><span>Deposit</span><input type="number" value={draft.advance_deposit_value??''} onChange={e=>setDraft({...draft,advance_deposit_type:'percentage',advance_deposit_value:e.target.value===''?null:Number(e.target.value)})}/><small>%</small></label><div><span>Pay now</span><b>{formatMoney(getAdvanceSummary(draft).advanceAmount,draft.currency)}</b></div><div><span>Balance</span><b>{formatMoney(getAdvanceSummary(draft).remainingBalance,draft.currency)}</b></div></div>
+              <div className="editorSectionHeader v10PriceHeader"><div><span className="eyebrow">PRICE · 4 EASY STEPS</span><h3>Build the traveller price</h3><p>Enter the real agent/supplier prices in LKR. Ceylon Wellness calculates the rest.</p></div><div className="v10BudgetBadge"><span>Traveller budget</span><b>{travellerBudget===null?'Not set':draft.budget_range||'Not set'}</b><small>Use this only as a guide while planning.</small></div></div>
+
+              <div className="simplePriceStep"><div className="simpleStepNo">1</div><div className="simpleStepBody"><h4>Add the real costs</h4><p>Choose a service, add the place, then type the price the agent/supplier gave you. All supplier prices stay private and in LKR.</p><div className="costQuickAdd"><button type="button" onClick={()=>addCostLine('Hotel','per room/night','Hotel')}><Plus/> Hotel</button><button type="button" onClick={()=>addCostLine('Transport','per day','Vehicle + driver')}><Plus/> Transport</button><button type="button" onClick={()=>addCostLine('Travel Activity','per person','Travel activity')}><Plus/> Activity</button><button type="button" onClick={()=>addCostLine('Wellness','per person','Wellness activity')}><Plus/> Wellness</button></div>
+              <div className="costTable simpleCostTable"><div className="costTableHead"><span>Place</span><span>Service</span><span>Qty</span><span>Supplier price · LKR</span><span>Traveller price</span><span></span></div>{costLines.length===0&&<div className="costEmpty"><Sparkles/><div><b>Start with one service</b><span>Example: Kandy · Hotel · 2 nights · LKR 35,000 per night.</span></div></div>}{costLines.map(line=>{const lineCost=(Number(line.qty)||0)*(Number(line.rate)||0);const lineSellLkr=lineCost*(1+markupPercent/100);const lineTraveller=fxRate>0?lineSellLkr/fxRate:0;return <div className="costRow simpleCostRow" key={line.id}><input value={line.place} onChange={e=>updateCostLine(line.id,{place:e.target.value})} placeholder="e.g. Kandy"/><div className="serviceCell"><select value={line.category} onChange={e=>updateCostLine(line.id,{category:e.target.value as CostLine['category']})}><option>Hotel</option><option>Transport</option><option>Travel Activity</option><option>Wellness</option><option>Other</option></select><input value={line.label} onChange={e=>updateCostLine(line.id,{label:e.target.value})} placeholder="e.g. Hotel & breakfast"/></div><input type="number" min="0" step="0.01" value={line.qty} onChange={e=>updateCostLine(line.id,{qty:Number(e.target.value)})}/><div className="rateCell"><input type="number" min="0" step="0.01" value={line.rate||''} onChange={e=>updateCostLine(line.id,{rate:Number(e.target.value)})} placeholder="0.00"/><small>{line.unit}</small></div><strong>{fxRate>0?formatMoney(lineTraveller,quoteCurrency):'Set currency rate'}</strong><button type="button" className="costRemove" onClick={()=>removeCostLine(line.id)} aria-label="Remove cost line"><Trash2/></button></div>})}</div><div className="simpleTotal"><span>Our real supplier cost</span><strong>{formatMoney(supplierTotal,'LKR')}</strong><small>Private · never shown to the traveller</small></div></div></div>
+
+              <div className="simplePriceStep"><div className="simpleStepNo">2</div><div className="simpleStepBody"><h4>Add our percentage</h4><p>Pick the Ceylon Wellness margin. The traveller only sees the final selling prices — never the supplier cost or this percentage.</p><div className="markupPresets">{[10,15,20,25,30].map(v=><button type="button" key={v} className={markupPercent===v?'active':''} onClick={()=>setQuoteMeta({...quoteMeta,markupPercent:v})}>{v}%</button>)}<label>Custom <input type="number" min="0" step="0.1" value={quoteMeta.markupPercent??0} onChange={e=>setQuoteMeta({...quoteMeta,markupPercent:Number(e.target.value)})}/>%</label></div><div className="simpleMath"><span>Supplier cost <b>{formatMoney(supplierTotal,'LKR')}</b></span><span>Our margin <b>{formatMoney(marginValue,'LKR')}</b></span><span>Calculated selling price <b>{formatMoney(sellingTotal,'LKR')}</b></span></div></div></div>
+
+              <div className="simplePriceStep"><div className="simpleStepNo">3</div><div className="simpleStepBody"><h4>Choose the traveller currency</h4><p>Enter one exchange rate for this quotation. Example: if PLN 1 equals LKR 89, type 89.</p><div className="simpleFxGrid"><label><span>Traveller pays in</span><select value={quoteCurrency} onChange={e=>{const c=e.target.value;setDraft({...draft,currency:c});setQuoteMeta({...quoteMeta,fxRateLkrPerQuoteCurrency:c==='LKR'?1:quoteMeta.fxRateLkrPerQuoteCurrency,finalTravellerPrice:0});}}>{Array.from(new Set([...CURRENCY_OPTIONS,'CHF','AUD','CAD'])).map(c=><option key={c}>{c}</option>)}</select></label><label><span>Exchange rate</span><div className="fxRateInput"><b>1 {quoteCurrency} =</b><input type="number" min="0" step="0.0001" disabled={quoteCurrency==='LKR'} value={quoteCurrency==='LKR'?1:(quoteMeta.fxRateLkrPerQuoteCurrency||'')} onChange={e=>setQuoteMeta({...quoteMeta,fxRateLkrPerQuoteCurrency:Number(e.target.value),finalTravellerPrice:0})}/><b>LKR</b></div></label><div className="simpleSuggestion"><span>System suggestion</span><strong>{fxRate>0?formatMoney(convertedSellingTotal,quoteCurrency):'Enter exchange rate'}</strong></div></div></div></div>
+
+              <div className="simplePriceStep simplePriceStep--final"><div className="simpleStepNo">4</div><div className="simpleStepBody"><h4>Set the final traveller price</h4><p>You can use the system suggestion or round it to a clean commercial price. This is the total shown to the traveller.</p><div className="finalPriceEditor"><span>{quoteCurrency}</span><input type="number" min="0" step="0.01" value={quoteMeta.finalTravellerPrice||''} placeholder={fxRate>0?convertedSellingTotal.toFixed(2):'0.00'} onChange={e=>setQuoteMeta({...quoteMeta,finalTravellerPrice:Number(e.target.value)})}/><button type="button" className="outlineBtn" disabled={fxRate<=0} onClick={()=>setQuoteMeta({...quoteMeta,finalTravellerPrice:Number(convertedSellingTotal.toFixed(2))})}>Use suggestion</button></div><div className="travellerPricePreview"><span>Traveller will see</span><strong>{fxRate>0?formatMoney(finalTravellerPrice,quoteCurrency):'Set exchange rate first'}</strong><small>Place-by-place service prices above are traveller selling prices. Supplier costs and margin stay private.</small></div><button type="button" className="button simpleSavePrice" onClick={applyCosting}><CheckCircle2/> Save Price &amp; Continue</button></div></div>
+
+              <div className="bankPaymentPanel"><div><span className="eyebrow">PAYMENT DETAILS</span><h4>Where should the traveller pay?</h4><small>These details can be shown on the quotation. The payment reference defaults to the journey reference.</small></div><div className="bankPaymentGrid"><label><span>Payment method</span><select value={quoteMeta.paymentMethod} onChange={e=>setQuoteMeta({...quoteMeta,paymentMethod:e.target.value})}><option>Bank Transfer</option><option>Other</option></select></label><label><span>Account holder</span><input value={quoteMeta.accountHolder} onChange={e=>setQuoteMeta({...quoteMeta,accountHolder:e.target.value})}/></label><label><span>Bank name</span><input value={quoteMeta.bankName} onChange={e=>setQuoteMeta({...quoteMeta,bankName:e.target.value})}/></label><label><span>IBAN / Account number</span><input value={quoteMeta.accountNumber} onChange={e=>setQuoteMeta({...quoteMeta,accountNumber:e.target.value})}/></label><label><span>SWIFT / BIC</span><input value={quoteMeta.swiftBic} onChange={e=>setQuoteMeta({...quoteMeta,swiftBic:e.target.value})}/></label><label><span>Bank address · optional</span><input value={quoteMeta.bankAddress} onChange={e=>setQuoteMeta({...quoteMeta,bankAddress:e.target.value})}/></label><label className="bankPaymentWide"><span>Payment reference</span><input value={quoteMeta.paymentReference} placeholder={draft.journey_ref||'Journey reference'} onChange={e=>setQuoteMeta({...quoteMeta,paymentReference:e.target.value})}/></label></div><button type="button" className="outlineBtn" onClick={applyPaymentDetails}><CheckCircle2/> Add payment details to quotation</button></div>
+              <div className="depositPanel"><div><span className="eyebrow">DEPOSIT</span><h4>How much should they pay now?</h4><small>Choose a percentage. The balance is calculated automatically from the saved final price.</small></div><div className="depositPresets"><button type="button" onClick={()=>setDepositPreset(20)}>20%</button><button type="button" onClick={()=>setDepositPreset(30)}>30%</button><button type="button" onClick={()=>setDepositPreset(50)}>50%</button></div><label><span>Custom</span><input type="number" value={draft.advance_deposit_value??''} onChange={e=>setDraft({...draft,advance_deposit_type:'percentage',advance_deposit_value:e.target.value===''?null:Number(e.target.value)})}/><small>%</small></label><div><span>Pay now</span><b>{formatMoney(getAdvanceSummary(draft).advanceAmount,draft.currency)}</b></div><div><span>Balance</span><b>{formatMoney(getAdvanceSummary(draft).remainingBalance,draft.currency)}</b></div></div>
             </div>
 
             <div className="editorSection editorSection--booking">
@@ -1292,20 +1274,7 @@ return (
               </div>
             </div>
 
-            <div className="v102PersistentActions" role="region" aria-label="Journey actions">
-              <div className="v102ActionMeta"><span className="eyebrow">JOURNEY ACTIONS</span><b>{draft.journey_ref||'New journey'}</b><small>Save anytime · PDF actions stay visible</small></div>
-              <div className="v102ActionButtons">
-                <button type="button" className="outlineBtn" onClick={saveLead}><CheckCircle2/> Save Draft</button>
-                <button type="button" className="outlineBtn" onClick={()=>generateTravellerPdf(draft)}><FileText/> Preview PDF</button>
-                <button type="button" className="button v102DownloadBtn" onClick={saveAndDownloadPdf}><Download/> Save &amp; Download PDF</button>
-                <button type="button" className="v102TrashBtn" onClick={()=>openSoftDelete('travel',selected.id,selected.name||'Traveller',selected.journey_ref||'Journey')}><Trash2/> Move to Trash</button>
-              </div>
-              <div className="v102SecondaryActions">
-                <a href={wa(travelMsg)} target="_blank" rel="noreferrer"><MessageCircle/> WhatsApp</a>
-                <a href={emailLink(selected.email,`Ceylon Wellness · ${selected.journey_ref||'Journey'}`,travelMsg)}><Mail/> Email</a>
-                <button type="button" onClick={()=>setEditing(false)}>Cancel edit</button>
-              </div>
-            </div>
+            <div className="v102DangerZone"><span>Need to remove this journey?</span><button type="button" className="v102TrashBtn" onClick={()=>openSoftDelete('travel',selected.id,selected.name||'Traveller',selected.journey_ref||'Journey')}><Trash2/> Move to Trash</button></div>
           </div>
           </>
         ) : (

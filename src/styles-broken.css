@@ -1,0 +1,323 @@
+
+/* =========================================================
+   ASK CEYLON — PROFESSIONAL DESTINATION CARDS V2
+   Add this block at the END of styles.css
+   ========================================================= */
+
+.askCeylonV2.ceylonGlass .destinationPicker{
+  position:relative;
+  z-index:1;
+  padding:22px;
+  border:1px solid rgba(22,58,43,.09);
+  border-radius:24px;
+  background:rgba(255,255,255,.68);
+  box-shadow:0 18px 50px rgba(13,42,32,.055);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+
+.askCeylonV2.ceylonGlass .destinationToolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  margin-bottom:18px;
+  padding:2px 2px 14px;
+  border-bottom:1px solid rgba(22,58,43,.08);
+}
+
+.askCeylonV2.ceylonGlass .destinationToolbarText{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.askCeylonV2.ceylonGlass .destinationToolbarText strong{
+  color:var(--cg-ink);
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:.01em;
+}
+
+.askCeylonV2.ceylonGlass .destinationToolbarText span{
+  color:var(--cg-ink-soft);
+  font-size:11px;
+  line-height:1.5;
+}
+
+.askCeylonV2.ceylonGlass .destinationSelectAll{
+  flex:none;
+  border:1px solid rgba(22,58,43,.14);
+  border-radius:999px;
+  padding:9px 14px;
+  background:rgba(255,255,255,.82);
+  color:var(--cg-ink);
+  font:700 11px 'DM Sans',sans-serif;
+  cursor:pointer;
+  transition:.18s ease;
+}
+
+.askCeylonV2.ceylonGlass .destinationSelectAll:hover{
+  border-color:rgba(22,58,43,.34);
+  transform:translateY(-1px);
+  box-shadow:0 7px 18px rgba(13,42,32,.07);
+}
+
+.askCeylonV2.ceylonGlass .destinationGrid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+}
+
+.askCeylonV2.ceylonGlass .destinationCard{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  padding:0;
+  overflow:hidden;
+  border:1px solid rgba(22,58,43,.10);
+  border-radius:18px;
+  background:rgba(255,255,255,.92);
+  color:var(--cg-ink);
+  text-align:left;
+  cursor:pointer;
+  box-shadow:0 7px 22px rgba(13,42,32,.045);
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    border-color .2s ease;
+}
+
+.askCeylonV2.ceylonGlass .destinationCard:hover{
+  transform:translateY(-3px);
+  border-color:rgba(22,58,43,.24);
+  box-shadow:0 16px 34px rgba(13,42,32,.10);
+}
+
+.askCeylonV2.ceylonGlass .destinationCard.selected{
+  border-color:var(--forest);
+  box-shadow:
+    0 0 0 2px rgba(22,58,43,.08),
+    0 16px 34px rgba(13,42,32,.11);
+}
+
+.askCeylonV2.ceylonGlass .destinationImageWrap{
+  position:relative;
+  display:block;
+  height:190px;
+  overflow:hidden;
+  background:#e9e5dc;
+}
+
+.askCeylonV2.ceylonGlass .destinationImage{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transition:transform .45s ease;
+}
+
+.askCeylonV2.ceylonGlass .destinationCard:hover .destinationImage{
+  transform:scale(1.035);
+}
+
+.askCeylonV2.ceylonGlass .destinationImageShade{
+  position:absolute;
+  inset:auto 0 0;
+  height:55%;
+  background:linear-gradient(
+    to top,
+    rgba(8,28,21,.70) 0%,
+    rgba(8,28,21,.22) 52%,
+    rgba(8,28,21,0) 100%
+  );
+  pointer-events:none;
+}
+
+.askCeylonV2.ceylonGlass .destinationRegion{
+  position:absolute;
+  top:10px;
+  left:10px;
+  padding:5px 8px;
+  border:1px solid rgba(255,255,255,.48);
+  border-radius:999px;
+  background:rgba(255,255,255,.78);
+  color:#294b3e;
+  font:800 8px 'DM Sans',sans-serif;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+
+.askCeylonV2.ceylonGlass .destinationImageTitle{
+  position:absolute;
+  left:14px;
+  right:42px;
+  bottom:13px;
+  color:#fff;
+  font:600 23px/1.05 'DM Serif Display',serif;
+  text-shadow:0 2px 12px rgba(0,0,0,.28);
+}
+
+.askCeylonV2.ceylonGlass .destinationCheck{
+  position:absolute;
+  top:10px;
+  right:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:31px;
+  height:31px;
+  border:1px solid rgba(255,255,255,.72);
+  border-radius:50%;
+  background:rgba(25,69,55,.94);
+  color:#fff;
+  box-shadow:0 6px 16px rgba(0,0,0,.18);
+}
+
+.askCeylonV2.ceylonGlass .destinationCheck svg{
+  width:17px;
+  height:17px;
+}
+
+.askCeylonV2.ceylonGlass .destinationInfo{
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  gap:10px;
+  min-height:82px;
+  padding:13px 14px 14px;
+  background:rgba(255,255,255,.96);
+}
+
+.askCeylonV2.ceylonGlass .destinationInfo p{
+  margin:0;
+  color:#68736c;
+  font-size:11px;
+  line-height:1.5;
+}
+
+.askCeylonV2.ceylonGlass .destinationSelectedLabel{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  width:max-content;
+  color:var(--forest);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.03em;
+}
+
+.askCeylonV2.ceylonGlass .destinationSelectedLabel svg{
+  width:14px;
+  height:14px;
+}
+
+.askCeylonV2.ceylonGlass .destinationHint{
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  gap:7px;
+  margin-top:14px;
+  color:#7a837d;
+  font-size:10px;
+  line-height:1.5;
+  text-align:center;
+}
+
+.askCeylonV2.ceylonGlass .destinationHint svg{
+  flex:none;
+  width:13px;
+  height:13px;
+  margin-top:1px;
+}
+
+/* Selected cards feel premium, not loud */
+.askCeylonV2.ceylonGlass .destinationCard.selected .destinationImageShade{
+  background:linear-gradient(
+    to top,
+    rgba(8,28,21,.76) 0%,
+    rgba(8,28,21,.25) 52%,
+    rgba(8,28,21,0) 100%
+  );
+}
+
+/* Tablet */
+@media(max-width:900px){
+  .askCeylonV2.ceylonGlass .destinationGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+/* Mobile */
+@media(max-width:600px){
+  .askCeylonV2.ceylonGlass .destinationPicker{
+    padding:14px;
+    border-radius:18px;
+  }
+
+  .askCeylonV2.ceylonGlass .destinationToolbar{
+    align-items:flex-start;
+  }
+
+  .askCeylonV2.ceylonGlass .destinationGrid{
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+  }
+
+  .askCeylonV2.ceylonGlass .destinationImageWrap{
+    height:145px;
+  }
+
+  .askCeylonV2.ceylonGlass .destinationImageTitle{
+    left:10px;
+    bottom:10px;
+    font-size:18px;
+  }
+
+  .askCeylonV2.ceylonGlass .destinationRegion{
+    top:7px;
+    left:7px;
+    max-width:calc(100% - 14px);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:7px;
+  }
+
+  .askCeylonV2.ceylonGlass .destinationCheck{
+    top:7px;
+    right:7px;
+    width:27px;
+    height:27px;
+  }
+
+  .askCeylonV2.ceylonGlass .destinationInfo{
+    min-height:72px;
+    padding:9px 10px 10px;
+  }
+
+  .askCeylonV2.ceylonGlass .destinationInfo p{
+    font-size:10px;
+  }
+}
+
+@media(max-width:430px){
+  .askCeylonV2.ceylonGlass .destinationGrid{
+    grid-template-columns:1fr;
+  }
+
+  .askCeylonV2.ceylonGlass .destinationImageWrap{
+    height:190px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .askCeylonV2.ceylonGlass .destinationCard,
+  .askCeylonV2.ceylonGlass .destinationImage,
+  .askCeylonV2.ceylonGlass .destinationSelectAll{
+    transition:none;
+  }
+}

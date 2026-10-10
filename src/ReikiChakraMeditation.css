@@ -1,0 +1,33 @@
+/* Premium lotus and guided self-meditation additions */
+.rp .rcChakraGrid>div{display:flex;flex-direction:column;align-items:center;text-align:center;gap:5px;padding:12px 5px;border-radius:20px;transition:transform .2s ease,background .2s ease}
+.rp .rcChakraGrid>div:hover{transform:translateY(-4px);background:rgba(255,255,255,.66)}
+.rp .rcLotus{display:block;width:min(100%,102px);height:auto;filter:drop-shadow(0 6px 10px rgba(31,60,43,.12))}
+.rp .rcChakraGrid b{font-size:13px;color:#183e2e}
+.rp .rcChakraGrid small{font-size:11px;line-height:1.4;color:#56685e}
+.rp .rcChakraGrid small:first-of-type{font-weight:700;color:#3e6a52}
+.rp .rcMeditation{margin-top:24px;background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(240,246,238,.95));border:1px solid rgba(28,92,62,.12);border-radius:24px;padding:clamp(18px,3vw,28px);box-shadow:0 16px 35px rgba(22,64,43,.08);color:#183c2c}
+.rp .rcMeditationTop{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:10px;letter-spacing:.12em;font-weight:800;color:#477b59}
+.rp .rcMeditationTime{color:#8d784e}
+.rp .rcMeditation h3{font-family:Georgia,serif;font-size:clamp(23px,3vw,32px);margin:12px 0 7px}
+.rp .rcMeditationIntro{font-size:13px;line-height:1.6;color:#5c6b60}
+.rp .rcMeditationProgress{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:18px 0}
+.rp .rcMeditationProgress span{height:5px;background:#dfe8df;border-radius:12px}
+.rp .rcMeditationProgress .rcDone{background:#24744d}
+.rp .rcMeditationStep{min-height:156px;padding:16px 18px;border-radius:17px;background:#f3f7f0;border:1px solid #e5ede2}
+.rp .rcMeditationStep>span{font-size:10px;letter-spacing:.12em;color:#63846c;font-weight:800}
+.rp .rcMeditationStep h4{margin:8px 0;font-size:18px;color:#21432e}
+.rp .rcMeditationStep p{font-size:13px;line-height:1.7;margin:0;color:#4b6052}
+.rp .rcMeditationControls{display:flex;justify-content:space-between;gap:10px;margin:14px 0 10px}
+.rp .rcMeditationControls button{padding:10px 16px;border-radius:999px;border:1px solid #c5d9c9;background:white;color:#24583a;cursor:pointer;font-weight:700}
+.rp .rcMeditationControls button:last-child{background:#17683f;color:white;border-color:#17683f}
+.rp .rcMeditationControls button:disabled{opacity:.4;cursor:not-allowed}
+.rp .rcMeditationControls button:focus-visible{outline:3px solid #d2b569;outline-offset:3px}
+.rp .rcMeditation>small{font-size:11px;color:#6d7a70;line-height:1.5}
+@media(max-width:600px){.rp .rcChakraGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.rp .rcLotus{max-width:90px}.rp .rcMeditationStep{min-height:190px}}
+
+/* Legal links and booking notice */
+.rp .rcLegalNotice{font-size:12px;line-height:1.65;color:#4d6657;margin:12px 0;padding:12px 14px;background:#f0f6ee;border:1px solid #d9e7d8;border-radius:12px}
+.rp .rcLegalNotice a,.rp .rcLegalFooter a{color:#17683f;text-decoration:underline;text-underline-offset:3px}
+.rp .rcLegalFooter{margin:28px 0 0;padding:20px 10px;border-top:1px solid #dbe5d8;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px;color:#637268}
+.rp .rcLegalFooter nav{display:flex;gap:15px;flex-wrap:wrap}
+.rp .rcLegalFooter a:focus-visible,.rp .rcLegalNotice a:focus-visible{outline:2px solid #b8a05c;outline-offset:3px}

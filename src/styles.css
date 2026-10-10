@@ -2058,3 +2058,38 @@ body{overflow-x:hidden}
  .siteHeader nav.open{overscroll-behavior:contain}
  .siteHeader nav a:focus-visible,.siteHeader .menu:focus-visible,.siteHeader nav select:focus-visible{outline:2px solid var(--forest);outline-offset:2px}
 }
+
+/* Ask Ceylon · premium experience discovery */
+.experienceChooser{margin:0 0 30px;padding:clamp(18px,3vw,32px);border:1px solid rgba(26,75,50,.13);border-radius:28px;background:linear-gradient(145deg,#fffdf7,#f5f7f0);box-shadow:0 15px 44px rgba(27,60,38,.06)}
+.experienceChooserIntro{text-align:center;margin-bottom:23px}.experienceChooserIntro>span{font-size:11px;font-weight:800;letter-spacing:.2em;color:#9c8047}.experienceChooserIntro h2{margin:7px 0;color:#194b32;font-size:clamp(25px,3vw,34px);letter-spacing:-.04em}.experienceChooserIntro p{margin:0;color:#63746a;font-size:14px}
+.experienceCategoryGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}.experienceCategoryCard{overflow:hidden;border:1px solid rgba(22,74,48,.1);border-radius:20px;background:white;padding:0;text-align:left;cursor:pointer;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;box-shadow:0 5px 18px rgba(25,62,42,.05)}.experienceCategoryCard:hover{transform:translateY(-4px);box-shadow:0 13px 28px rgba(25,62,42,.13)}.experienceCategoryCard.active{border:2px solid #b69a56;box-shadow:0 0 0 3px rgba(182,154,86,.12),0 12px 26px rgba(25,62,42,.13)}.experienceCategoryPhoto{display:block;position:relative;aspect-ratio:1.8;overflow:hidden;background:linear-gradient(135deg,#c4d5bf,#3b6d56)}.experienceCategoryPhoto img{width:100%;height:100%;object-fit:cover;transition:transform .35s ease}.experienceCategoryCard:hover img{transform:scale(1.045)}.experienceCategoryOverlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(11,42,27,.18))}.experienceCategoryMark{position:absolute;right:12px;top:12px;display:grid;place-items:center;width:29px;height:29px;border-radius:50%;background:rgba(255,255,255,.92);color:#1c5438;font-weight:800}.experienceCategoryCard.active .experienceCategoryMark{background:#1b5639;color:#fff}.experienceCategoryCopy{display:flex;flex-direction:column;gap:4px;padding:14px 15px 16px}.experienceCategoryCopy strong{font-size:14px;color:#1d4b34}.experienceCategoryCopy small{font-size:12px;color:#718074}.experienceReset{display:block;margin:22px auto 0;padding:11px 20px;border-radius:30px;border:1px solid #bba46f;background:transparent;color:#24553b;font-weight:700;cursor:pointer}.experienceReset:hover{background:#eef3e9}.experienceHelper{text-align:center;font-size:12px;color:#738076;margin:10px 0 0}@media(max-width:760px){.experienceCategoryGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.experienceChooser{padding:16px;border-radius:22px}.experienceCategoryCopy{padding:11px}.experienceCategoryCopy strong{font-size:12px}.experienceCategoryPhoto{aspect-ratio:1.35}}@media(max-width:390px){.experienceCategoryGrid{grid-template-columns:1fr 1fr}.experienceCategoryCopy strong{font-size:11px}}
+
+/* Ask Ceylon: compact premium experience selection cards */
+@media (min-width: 1025px) {
+  .experienceCategoryGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; max-width: 900px; margin-inline: auto; }
+}
+.experienceCategoryCard { border-radius: 15px; }
+.experienceCategoryPhoto { aspect-ratio: 2.8; }
+.experienceCategoryCopy { padding: 9px 12px 11px; gap: 2px; }
+.experienceCategoryCopy strong { font-size: 13px; }
+.experienceCategoryCopy small { font-size: 11px; }
+.experienceCategoryMark { width: 24px; height: 24px; right: 9px; top: 9px; }
+@media (max-width: 760px) {
+  .experienceCategoryGrid { gap: 9px; }
+  .experienceCategoryPhoto { aspect-ratio: 2; }
+  .experienceCategoryCopy { padding: 9px 10px; }
+}
+
+/* Ask Ceylon: six compact experience cards in one desktop row */
+@media (min-width: 1100px) {
+  .experienceCategoryGrid { grid-template-columns: repeat(6, minmax(0, 1fr)); max-width: none; gap: 10px; }
+  .experienceCategoryCard { min-width: 0; border-radius: 13px; }
+  .experienceCategoryPhoto { aspect-ratio: 1.75; }
+  .experienceCategoryCopy { padding: 9px 8px 11px; gap: 3px; }
+  .experienceCategoryCopy strong { font-size: 11px; line-height: 1.3; }
+  .experienceCategoryCopy small { font-size: 10px; line-height: 1.3; }
+  .experienceCategoryMark { width: 21px; height: 21px; top: 7px; right: 7px; font-size: 11px; }
+}
+@media (min-width: 761px) and (max-width: 1099px) {
+  .experienceCategoryGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}

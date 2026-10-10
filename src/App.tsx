@@ -1,3 +1,4 @@
+import AboutPage from './AboutPage';
 import ReikiPremium from './ReikiPremium';
 import {Routes,Route,Link,useLocation} from 'react-router-dom';
 import {Leaf,Menu,X,ArrowRight,ArrowLeft,ShieldCheck,MessageCircle,Languages,Sparkles,MapPin,Compass,Heart,CheckCircle2,ExternalLink,RotateCcw,Clock,CalendarDays,Users,Footprints,Send,Plane,Hotel,FileText,Pencil,Plus,Trash2,Download,Eye,Settings2,Mail,Phone,LockKeyhole,LogIn,LogOut,RefreshCw,Search,UserRound} from 'lucide-react';
@@ -1869,6 +1870,6 @@ return (
   </main>
 );
 }
-export default function App(){const [lang,setLang]=useState<Lang>('EN');const wrap=(x:React.ReactNode)=><Shell lang={lang} setLang={setLang}>{x}</Shell>;return <Routes><Route path="/" element={wrap(<Home lang={lang}/>)}/><Route path="/ask-ceylon" element={wrap(<AskCeylon lang={lang}/>)}/><Route path="/design-your-journey" element={wrap(<AskCeylon lang={lang}/>)}/><Route path="/reiki" element={wrap(<ReikiPremium lang={lang}/>)}/><Route path="/dr-vipula" element={<VipulaRedirect/>}/><Route path="/wellness" element={wrap(<WellnessGuide lang={lang}/>)}/><Route path="/sri-lanka" element={wrap(<SriLankaGuide lang={lang}/>)}/><Route path="/about" element={wrap(<Simple lang={lang} title="Founder-managed. Human-centred."/>)}/><Route path="/privacy" element={wrap(<Privacy/>)}/><Route path="/admin" element={<AdminWorkspace/>}/><Route path="/terms" element={wrap(<Legal title="Terms & Conditions"/>)}/><Route path="*" element={wrap(<Simple lang={lang} title="Page not found"/>)}/></Routes>}
+export default function App(){const [lang,setLang]=useState<Lang>('EN');const wrap=(x:React.ReactNode)=><Shell lang={lang} setLang={setLang}>{x}</Shell>;return <Routes><Route path="/" element={wrap(<Home lang={lang}/>)}/><Route path="/ask-ceylon" element={wrap(<AskCeylon lang={lang}/>)}/><Route path="/design-your-journey" element={wrap(<AskCeylon lang={lang}/>)}/><Route path="/reiki" element={wrap(<ReikiPremium lang={lang}/>)}/><Route path="/dr-vipula" element={<VipulaRedirect/>}/><Route path="/wellness" element={wrap(<WellnessGuide lang={lang}/>)}/><Route path="/sri-lanka" element={wrap(<SriLankaGuide lang={lang}/>)}/><Route path="/about" element={wrap(<AboutPage lang={lang}/>)}/><Route path="/privacy" element={wrap(<Privacy/>)}/><Route path="/admin" element={<AdminWorkspace/>}/><Route path="/terms" element={wrap(<Legal title="Terms & Conditions"/>)}/><Route path="*" element={wrap(<Simple lang={lang} title="Page not found"/>)}/></Routes>}
 
 
